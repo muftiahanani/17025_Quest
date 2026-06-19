@@ -328,50 +328,33 @@ function showTab(tab){
 
 // RANKING
 async function loadRanking(){
-  const list=document.getElementById('rankList');
+  const list=document.getElementById("rankList");
   list.innerHTML='<div class="loading">Memuat ranking...</div>';
-
-  // Get all user progress
-  const {data:allProg}=await sb.from('user_progress').select('user_id,best_score');
+  const [{data:allProg},{data:profilesData}]=await Promise.all([
+    sb.from("user_progress").select("user_id,best_score"),
+    sb.from("profiles").select("id,full_name")
+  ]);
   if(!allProg||allProg.length===0){list.innerHTML='<div class="loading">Belum ada data ranking.</div>';return;}
-
-  // Aggregate XP per user
-  const userXP={};
+  const profileMap={};
+  (profilesData||[]).forEach(p=>{profileMap[p.id]=p.full_name;});
+  const userXP={},userLevels={};
   allProg.forEach(p=>{
     userXP[p.user_id]=(userXP[p.user_id]||0)+(p.best_score*10);
+    if(p.best_score>=8){userLevels[p.user_id]=(userLevels[p.user_id]||0)+1;}
   });
-
-  // Get user metadata from auth
-  const userIds=Object.keys(userXP);
-  const {data:profiles}=await sb.from('user_progress')
-    .select('user_id')
-    .in('user_id',userIds);
-
-  // Build ranking with names from auth metadata
-  // We can only get current user's name; others show anonymized
-  const sorted=Object.entries(userXP)
-    .sort((a,b)=>b[1]-a[1])
-    .slice(0,20);
-
-  list.innerHTML='';
+  const sorted=Object.entries(userXP).sort((a,b)=>b[1]-a[1]).slice(0,20);
+  list.innerHTML="";
   sorted.forEach(([uid,totalXp],i)=>{
     const isMe=uid===currentUser.id;
-    const name=isMe?(currentUser.user_metadata?.full_name||currentUser.email):`Pemain ${i+1}`;
+    const name=profileMap[uid]||(isMe?(currentUser.user_metadata?.full_name||currentUser.email):"Anonim");
     const pos=i+1;
-    const medal=pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':'';
-    const posClass=pos===1?'gold':pos===2?'silver':pos===3?'bronze':'';
-    const levDone=isMe?getLevelsCompleted():'—';
-    const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    const card=document.createElement('div');
-    card.className='rank-card'+(isMe?' me':'')+(posClass?' '+posClass:'');
-    card.innerHTML=`
-      <div class="rank-pos ${posClass}">${medal||pos}</div>
-      <div class="rank-avatar">${initials}</div>
-      <div class="rank-info">
-        <div class="rank-name">${name}${isMe?' (Kamu)':''}</div>
-        <div class="rank-detail">${isMe?levDone+' level selesai':'—'}</div>
-      </div>
-      <div class="rank-xp">${totalXp} XP</div>`;
+    const medal=pos===1?"🥇":pos===2?"🥈":pos===3?"🥉":"";
+    const posClass=pos===1?"gold":pos===2?"silver":pos===3?"bronze":"";
+    const levDone=userLevels[uid]||0;
+    const initials=name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
+    const card=document.createElement("div");
+    card.className="rank-card"+(isMe?" me":"")+(posClass?" "+posClass:"");
+    card.innerHTML=`<div class="rank-pos ${posClass}">${medal||pos}</div><div class="rank-avatar">${initials}</div><div class="rank-info"><div class="rank-name">${name}${isMe?" (Kamu)":""}</div><div class="rank-detail">${levDone} level selesai</div></div><div class="rank-xp">${totalXp} XP</div>`;
     list.appendChild(card);
   });
 }
