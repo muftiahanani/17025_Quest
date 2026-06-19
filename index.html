@@ -258,12 +258,24 @@ async function doRegister(){
   const name=document.getElementById('regName').value.trim();
   const email=document.getElementById('regEmail').value.trim();
   const pass=document.getElementById('regPassword').value;
-  if(!name||!email||!pass){setAuthMsg('Semua kolom wajib diisi.','error');return;}
-  if(pass.length<6){setAuthMsg('Password minimal 6 karakter.','error');return;}
-  setAuthMsg('Mendaftar...','');
-  const {error}=await sb.auth.signUp({email,password:pass,options:{data:{full_name:name}}});
-  if(error){setAuthMsg(error.message,'error');return;}
-  setAuthMsg('Berhasil! Silakan masuk.','success');switchTab('login');
+
+  const {data,error}=await sb.auth.signUp({
+    email,
+    password:pass,
+    options:{
+      data:{full_name:name}
+    }
+  });
+
+  console.log("SIGNUP DATA:",data);
+  console.log("SIGNUP ERROR:",error);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  alert("Registrasi berhasil");
 }
 
 async function doLogout(){
