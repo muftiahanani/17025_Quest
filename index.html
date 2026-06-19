@@ -291,27 +291,23 @@ async function loadData(){
 function getProgress(levelId){return allProgress.find(p=>p.level_id===levelId)||null;}
 function getLevelsForWorld(worldId){return allLevels.filter(l=>l.world_id===worldId);}
 
+function passingScore(level){return level.order_num===5?12:8;}
+
 function isWorldUnlocked(wi){
   if(wi===0)return true;
   const prev=worlds[wi-1];
   const prevLevels=getLevelsForWorld(prev.id);
-  // world unlocks when ALL active levels in prev world are completed
   const activePrev=prevLevels.filter(l=>l.is_active);
   if(activePrev.length===0)return false;
-  return activePrev.every(l=>{const p=getProgress(l.id);return p&&p.best_score>=8;});
+  return activePrev.every(l=>{const p=getProgress(l.id);return p&&p.best_score>=passingScore(l);});
 }
 
 function isLevelUnlocked(level,worldLevels){
-  // level 1 of any world: unlocked if is_active
   if(level.order_num===1)return level.is_active;
-  // subsequent levels: previous level must be completed with score >= 8
   const prev=worldLevels.find(l=>l.order_num===level.order_num-1);
   if(!prev)return level.is_active;
   const p=getProgress(prev.id);
-  const prevDone=p&&p.best_score>=8;
-  // is_active controls whether the level has questions ready
-  // but locking is purely based on previous level completion
-  return prevDone;
+  return p&&p.best_score>=passingScore(prev);
 }
 
 function getTotalXP(){
@@ -457,11 +453,18 @@ function shuffle(arr){
   return a;
 }
 
+function getLevelConfig(level){
+  // Boss quiz levels: order_num 5 in any world = 15 soal, passing 12
+  if(level.order_num===5){return{maxQ:15,passing:12};}
+  return{maxQ:10,passing:8};
+}
+
 async function startLevel(level){
   currentLevel=level;currentQ=0;hearts=5;xp=0;correct=0;
+  const cfg=getLevelConfig(level);
   const {data}=await sb.from('questions').select('*').eq('level_id',level.id);
   if(!data||data.length===0){alert('Soal belum tersedia untuk level ini.');return;}
-  const picked=shuffle(data).slice(0,10);
+  const picked=shuffle(data).slice(0,cfg.maxQ);
   shuffledQuestions=picked.map(q=>{
     const opts=[...q.options];
     const correctOpt=opts[q.correct_index];
@@ -550,32 +553,37 @@ function showGameOver(){
 
 async function showResult(){
   clearInterval(timerInterval);
-  const passed=correct>=8;
-  const stars=correct>=10?'⭐⭐⭐':correct>=9?'⭐⭐':correct>=8?'⭐':'';
-  const icon=correct>=9?'🎉':correct>=8?'👍':correct>=5?'📚':'💪';
-  const msg=correct>=9?'Luar biasa!':correct>=8?'Level selesai!':correct>=5?'Hampir! Coba lagi.':'Terus belajar!';
+  const cfg=getLevelConfig(currentLevel);
+  const passing=cfg.passing;
+  const maxQ=cfg.maxQ;
+  const passed=correct>=passing;
+  const pct=correct/maxQ;
+  const stars=correct>=maxQ?'⭐⭐⭐':pct>=0.9?'⭐⭐':correct>=passing?'⭐':'';
+  const icon=pct>=0.9?'🎉':correct>=passing?'👍':pct>=0.5?'📚':'💪';
+  const msg=pct>=0.9?'Luar biasa!':correct>=passing?'Level selesai!':pct>=0.5?'Hampir! Coba lagi.':'Terus belajar!';
   document.getElementById('resultIcon').textContent=icon;
   document.getElementById('resultTitle').textContent=msg;
-  document.getElementById('resultScore').textContent=`${correct}/10`;
+  document.getElementById('resultScore').textContent=`${correct}/${maxQ}`;
   document.getElementById('resultStars').textContent=stars;
   document.getElementById('resultXP').textContent=`+${xp} XP diperoleh`;
   document.getElementById('resultSub').textContent=currentLevel.name;
   document.getElementById('resultBadge').innerHTML=passed
     ?`<div class="pass-badge">✅ Level selesai! Level berikutnya terbuka</div>`
-    :`<div class="fail-badge">Butuh 8/10 untuk lanjut. Semangat!</div>`;
-  await saveProgress(correct,passed);
+    :`<div class="fail-badge">Butuh ${passing}/${maxQ} untuk lanjut. Semangat!</div>`;
+  await saveProgress(correct,passed,passing);
   await loadData();
   showScreen('result');
 }
 
-async function saveProgress(score,completed){
+async function saveProgress(score,completed,passing){
   const existing=getProgress(currentLevel.id);
   const bestScore=existing?Math.max(existing.best_score,score):score;
+  const pass=passing||8;
   await sb.from('user_progress').upsert({
     user_id:currentUser.id,
     level_id:currentLevel.id,
     best_score:bestScore,
-    completed:completed||(existing?.completed||false)
+    completed:bestScore>=pass||(existing?.completed||false)
   },{onConflict:'user_id,level_id'});
 }
 
