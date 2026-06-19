@@ -27,8 +27,12 @@ h1 span{color:#D4537E}
 .auth-msg{font-size:13px;text-align:center;margin-top:1rem;min-height:20px}
 .auth-msg.error{color:#A32D2D}.auth-msg.success{color:#27500A}
 .home-header{text-align:center;padding:1.5rem 0 1rem}
-.user-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1.5px solid #F1EFE8}
+.user-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1.5px solid #F1EFE8}
 .user-name{font-size:13px;color:#5F5E5A;font-weight:600}
+.nav-row{display:flex;gap:8px;margin-bottom:1.25rem}
+.nav-btn{flex:1;padding:8px;background:#F5F3FF;border:1.5px solid #E8E6F8;border-radius:10px;font-size:13px;font-weight:600;color:#534AB7;cursor:pointer;transition:all .15s}
+.nav-btn.active{background:#534AB7;color:#fff;border-color:#534AB7}
+.nav-btn:hover:not(.active){background:#EEEDFE}
 .logout-btn{font-size:12px;color:#888;background:none;border:1px solid #E8E6F8;border-radius:8px;padding:4px 10px;cursor:pointer}
 .world-list{display:grid;gap:14px;padding-bottom:1rem}
 .world-card{border:1.5px solid #E8E6F8;border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s}
@@ -90,6 +94,26 @@ h1 span{color:#D4537E}
 .btn-secondary{display:block;background:transparent;color:#534AB7;border:2px solid #534AB7;border-radius:12px;padding:13px;font-size:15px;font-weight:600;cursor:pointer;width:100%;margin-top:10px;transition:background .15s}
 .btn-secondary:hover{background:#EEEDFE}
 .loading{text-align:center;padding:3rem;color:#888;font-size:14px}
+/* RANKING */
+.rank-header{text-align:center;padding:1rem 0 1.5rem}
+.rank-title{font-size:20px;font-weight:700;color:#2C2C2A}
+.rank-sub{font-size:13px;color:#888;margin-top:4px}
+.rank-list{display:grid;gap:10px;padding-bottom:1rem}
+.rank-card{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1.5px solid #E8E6F8;border-radius:14px;background:#fff}
+.rank-card.me{border-color:#7F77DD;background:#EEEDFE}
+.rank-card.gold{border-color:#EF9F27}
+.rank-card.silver{border-color:#B4B2A9}
+.rank-card.bronze{border-color:#D85A30}
+.rank-pos{font-size:20px;width:32px;text-align:center;font-weight:700;color:#888;flex-shrink:0}
+.rank-pos.gold{color:#BA7517}
+.rank-pos.silver{color:#5F5E5A}
+.rank-pos.bronze{color:#D85A30}
+.rank-avatar{width:40px;height:40px;border-radius:50%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#534AB7;flex-shrink:0}
+.rank-info{flex:1}
+.rank-name{font-size:14px;font-weight:700;color:#2C2C2A}
+.rank-detail{font-size:12px;color:#888;margin-top:2px}
+.rank-xp{font-size:16px;font-weight:700;color:#534AB7}
+.rank-card.me .rank-xp{color:#3C3489}
 </style>
 </head>
 <body>
@@ -129,7 +153,20 @@ h1 span{color:#D4537E}
       <div class="user-name" id="userName"></div>
       <button class="logout-btn" onclick="doLogout()">Keluar</button>
     </div>
-    <div class="world-list" id="worldList"><div class="loading">Memuat...</div></div>
+    <div class="nav-row">
+      <button class="nav-btn active" onclick="showTab('worlds')">🗺️ Peta Dunia</button>
+      <button class="nav-btn" onclick="showTab('ranking')">🏆 Ranking</button>
+    </div>
+    <div id="tabWorlds">
+      <div class="world-list" id="worldList"><div class="loading">Memuat...</div></div>
+    </div>
+    <div id="tabRanking" style="display:none">
+      <div class="rank-header">
+        <div class="rank-title">🏆 Papan Peringkat</div>
+        <div class="rank-sub">Berdasarkan total XP terkumpul</div>
+      </div>
+      <div class="rank-list" id="rankList"><div class="loading">Memuat...</div></div>
+    </div>
   </div>
 
   <div id="levelSelect" class="screen">
@@ -186,20 +223,20 @@ h1 span{color:#D4537E}
 
 </div>
 <script>
-const SUPABASE_URL = 'https://omvoqbctacdkwyjbzknx.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tdm9xYmN0YWNka3d5amJ6a254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzUwNjcsImV4cCI6MjA5NzQxMTA2N30.2dh5DFKtWBqaTxH3dx9HVZl6IePq52FPvzDTj-8UBe4';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL='https://omvoqbctacdkwyjbzknx.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tdm9xYmN0YWNka3d5amJ6a254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzUwNjcsImV4cCI6MjA5NzQxMTA2N30.2dh5DFKtWBqaTxH3dx9HVZl6IePq52FPvzDTj-8UBe4';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const WORLD_COLORS = ['#534AB7','#1D9E75','#5F5E5A','#D85A30','#D4537E','#378ADD','#639922'];
-const WORLD_BG    = ['#EEEDFE','#E1F5EE','#F1EFE8','#FAECE7','#FBEAF0','#E6F1FB','#EAF3DE'];
+const WORLD_COLORS=['#534AB7','#1D9E75','#5F5E5A','#D85A30','#D4537E','#378ADD','#639922'];
+const WORLD_BG=['#EEEDFE','#E1F5EE','#F1EFE8','#FAECE7','#FBEAF0','#E6F1FB','#EAF3DE'];
 
-let currentUser=null, worlds=[], allLevels=[], allProgress=[];
-let currentWorld=null, currentLevel=null;
-let shuffledQuestions=[], currentQ=0, hearts=5, xp=0, correct=0;
-let timerVal=15, timerInterval=null, answered=false;
+let currentUser=null,worlds=[],allLevels=[],allProgress=[];
+let currentWorld=null,currentLevel=null,currentWorldIndex=0;
+let shuffledQuestions=[],currentQ=0,hearts=5,xp=0,correct=0;
+let timerVal=15,timerInterval=null,answered=false;
 
 // AUTH
-function switchTab(tab) {
+function switchTab(tab){
   document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));
   document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
   document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
@@ -214,7 +251,7 @@ async function doLogin(){
   setAuthMsg('Memproses...','');
   const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
   if(error){setAuthMsg(error.message,'error');return;}
-  currentUser=data.user; await afterLogin();
+  currentUser=data.user;await afterLogin();
 }
 
 async function doRegister(){
@@ -226,18 +263,18 @@ async function doRegister(){
   setAuthMsg('Mendaftar...','');
   const {error}=await sb.auth.signUp({email,password:pass,options:{data:{full_name:name}}});
   if(error){setAuthMsg(error.message,'error');return;}
-  setAuthMsg('Berhasil! Silakan masuk.','success'); switchTab('login');
+  setAuthMsg('Berhasil! Silakan masuk.','success');switchTab('login');
 }
 
 async function doLogout(){
   await sb.auth.signOut();
-  currentUser=null; worlds=[]; allLevels=[]; allProgress=[];
+  currentUser=null;worlds=[];allLevels=[];allProgress=[];
   showScreen('auth');
 }
 
 async function afterLogin(){
   document.getElementById('userName').textContent='👋 '+(currentUser.user_metadata?.full_name||currentUser.email);
-  await loadData(); showScreen('home');
+  await loadData();showScreen('home');
 }
 
 // DATA
@@ -247,7 +284,7 @@ async function loadData(){
     sb.from('levels').select('*').order('order_num'),
     sb.from('user_progress').select('*').eq('user_id',currentUser.id)
   ]);
-  worlds=w.data||[]; allLevels=l.data||[]; allProgress=p.data||[];
+  worlds=w.data||[];allLevels=l.data||[];allProgress=p.data||[];
   renderHome();
 }
 
@@ -257,16 +294,90 @@ function getLevelsForWorld(worldId){return allLevels.filter(l=>l.world_id===worl
 function isWorldUnlocked(wi){
   if(wi===0)return true;
   const prev=worlds[wi-1];
-  return getLevelsForWorld(prev.id).every(l=>{const p=getProgress(l.id);return p&&p.best_score>=8;});
+  const prevLevels=getLevelsForWorld(prev.id);
+  // world unlocks when ALL active levels in prev world are completed
+  const activePrev=prevLevels.filter(l=>l.is_active);
+  if(activePrev.length===0)return false;
+  return activePrev.every(l=>{const p=getProgress(l.id);return p&&p.best_score>=8;});
 }
 
 function isLevelUnlocked(level,worldLevels){
-  if(!level.is_active)return false;
-  if(level.order_num===1)return true;
+  // level 1 of any world: unlocked if is_active
+  if(level.order_num===1)return level.is_active;
+  // subsequent levels: previous level must be completed with score >= 8
   const prev=worldLevels.find(l=>l.order_num===level.order_num-1);
-  if(!prev)return true;
+  if(!prev)return level.is_active;
   const p=getProgress(prev.id);
-  return p&&p.best_score>=8;
+  const prevDone=p&&p.best_score>=8;
+  // is_active controls whether the level has questions ready
+  // but locking is purely based on previous level completion
+  return prevDone;
+}
+
+function getTotalXP(){
+  return allProgress.reduce((sum,p)=>sum+(p.best_score*10),0);
+}
+
+function getLevelsCompleted(){
+  return allProgress.filter(p=>p.best_score>=8).length;
+}
+
+// HOME TABS
+function showTab(tab){
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='worlds')||(i===1&&tab==='ranking')));
+  document.getElementById('tabWorlds').style.display=tab==='worlds'?'block':'none';
+  document.getElementById('tabRanking').style.display=tab==='ranking'?'block':'none';
+  if(tab==='ranking')loadRanking();
+}
+
+// RANKING
+async function loadRanking(){
+  const list=document.getElementById('rankList');
+  list.innerHTML='<div class="loading">Memuat ranking...</div>';
+
+  // Get all user progress
+  const {data:allProg}=await sb.from('user_progress').select('user_id,best_score');
+  if(!allProg||allProg.length===0){list.innerHTML='<div class="loading">Belum ada data ranking.</div>';return;}
+
+  // Aggregate XP per user
+  const userXP={};
+  allProg.forEach(p=>{
+    userXP[p.user_id]=(userXP[p.user_id]||0)+(p.best_score*10);
+  });
+
+  // Get user metadata from auth
+  const userIds=Object.keys(userXP);
+  const {data:profiles}=await sb.from('user_progress')
+    .select('user_id')
+    .in('user_id',userIds);
+
+  // Build ranking with names from auth metadata
+  // We can only get current user's name; others show anonymized
+  const sorted=Object.entries(userXP)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,20);
+
+  list.innerHTML='';
+  sorted.forEach(([uid,totalXp],i)=>{
+    const isMe=uid===currentUser.id;
+    const name=isMe?(currentUser.user_metadata?.full_name||currentUser.email):`Pemain ${i+1}`;
+    const pos=i+1;
+    const medal=pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':'';
+    const posClass=pos===1?'gold':pos===2?'silver':pos===3?'bronze':'';
+    const levDone=isMe?getLevelsCompleted():'—';
+    const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const card=document.createElement('div');
+    card.className='rank-card'+(isMe?' me':'')+(posClass?' '+posClass:'');
+    card.innerHTML=`
+      <div class="rank-pos ${posClass}">${medal||pos}</div>
+      <div class="rank-avatar">${initials}</div>
+      <div class="rank-info">
+        <div class="rank-name">${name}${isMe?' (Kamu)':''}</div>
+        <div class="rank-detail">${isMe?levDone+' level selesai':'—'}</div>
+      </div>
+      <div class="rank-xp">${totalXp} XP</div>`;
+    list.appendChild(card);
+  });
 }
 
 // HOME
@@ -275,7 +386,8 @@ function renderHome(){
   list.innerHTML='';
   worlds.forEach((world,wi)=>{
     const levels=getLevelsForWorld(world.id);
-    const done=levels.filter(l=>{const p=getProgress(l.id);return p&&p.best_score>=8;});
+    const activeLevels=levels.filter(l=>l.is_active);
+    const done=activeLevels.filter(l=>{const p=getProgress(l.id);return p&&p.best_score>=8;});
     const locked=!isWorldUnlocked(wi);
     const color=WORLD_COLORS[wi]||'#534AB7';
     const bg=WORLD_BG[wi]||'#EEEDFE';
@@ -287,16 +399,16 @@ function renderHome(){
       const isDone=p&&p.best_score>=8;
       const isUnlocked=!locked&&isLevelUnlocked(l,levels);
       const cls=isDone?'done':isUnlocked?'unlocked':'locked';
-      return `<div class="level-dot ${cls}">${isDone?'✓':l.order_num}</div>`;
+      return `<div class="level-dot ${cls}" title="${l.name}">${isDone?'✓':l.order_num}</div>`;
     }).join('');
     card.innerHTML=`
       <div class="world-header">
         <div class="world-icon">${world.icon||'📚'}</div>
         <div class="world-info">
-          <div class="world-name">${locked?'🔒 ':''} ${world.name}</div>
+          <div class="world-name">${locked?'🔒 ':''}${world.name}</div>
           <div class="world-desc">${world.description||''}</div>
         </div>
-        <div class="world-progress" style="background:${bg};color:${color}">${done.length}/${levels.length}</div>
+        <div class="world-progress" style="background:${bg};color:${color}">${done.length}/${activeLevels.length}</div>
       </div>
       <div class="world-levels">${dots}</div>`;
     if(!locked)card.onclick=()=>openWorld(world,wi);
@@ -306,7 +418,7 @@ function renderHome(){
 
 // LEVEL SELECT
 function openWorld(world,wi){
-  currentWorld=world;
+  currentWorld=world;currentWorldIndex=wi;
   const color=WORLD_COLORS[wi]||'#534AB7';
   const levels=getLevelsForWorld(world.id);
   document.getElementById('levelSelectHeader').innerHTML=`
@@ -321,17 +433,18 @@ function openWorld(world,wi){
     const p=getProgress(level.id);
     const done=p&&p.best_score>=8;
     const unlocked=isLevelUnlocked(level,levels);
+    const hasQuestions=level.is_active;
     const card=document.createElement('div');
-    card.className='level-card '+(done?'lc-done':unlocked?'lc-unlocked':'lc-locked');
+    card.className='level-card '+(done?'lc-done':unlocked&&hasQuestions?'lc-unlocked':'lc-locked');
     const stars=done?(p.best_score>=10?'⭐⭐⭐':p.best_score>=9?'⭐⭐':'⭐'):'';
-    const badgeTxt=done?`${stars} ${p.best_score}/10`:unlocked?'Mulai →':'🔒';
-    const badgeBg=done?'#EAF3DE':unlocked?'#EEEDFE':'#F1EFE8';
-    const badgeColor=done?'#27500A':unlocked?color:'#888';
+    const badgeTxt=done?`${stars} ${p.best_score}/10`:unlocked&&hasQuestions?'Mulai →':unlocked&&!hasQuestions?'Segera hadir':'🔒';
+    const badgeBg=done?'#EAF3DE':unlocked&&hasQuestions?'#EEEDFE':'#F1EFE8';
+    const badgeColor=done?'#27500A':unlocked&&hasQuestions?color:'#888';
     card.innerHTML=`
       <div class="lc-num" style="color:${color}">Level ${level.order_num}</div>
       <div class="lc-name">${level.name}</div>
       <div class="lc-badge" style="background:${badgeBg};color:${badgeColor}">${badgeTxt}</div>`;
-    if(unlocked)card.onclick=()=>startLevel(level);
+    if(unlocked&&hasQuestions)card.onclick=()=>startLevel(level);
     grid.appendChild(card);
   });
   showScreen('levelSelect');
@@ -345,9 +458,9 @@ function shuffle(arr){
 }
 
 async function startLevel(level){
-  currentLevel=level; currentQ=0; hearts=5; xp=0; correct=0;
+  currentLevel=level;currentQ=0;hearts=5;xp=0;correct=0;
   const {data}=await sb.from('questions').select('*').eq('level_id',level.id);
-  if(!data||data.length===0){alert('Soal belum tersedia. Segera hadir!');return;}
+  if(!data||data.length===0){alert('Soal belum tersedia untuk level ini.');return;}
   const picked=shuffle(data).slice(0,10);
   shuffledQuestions=picked.map(q=>{
     const opts=[...q.options];
@@ -355,7 +468,7 @@ async function startLevel(level){
     const shuffledOpts=shuffle(opts);
     return{...q,options:shuffledOpts,correct_index:shuffledOpts.indexOf(correctOpt)};
   });
-  showScreen('quiz'); renderQuestion();
+  showScreen('quiz');renderQuestion();
 }
 
 function renderHearts(){document.getElementById('hearts').innerHTML=Array.from({length:5},(_,i)=>i<hearts?'❤️':'🤍').join('');}
@@ -383,7 +496,7 @@ function renderQuestion(){
 }
 
 function startTimer(){
-  clearInterval(timerInterval); timerVal=15; updateTimerUI();
+  clearInterval(timerInterval);timerVal=15;updateTimerUI();
   timerInterval=setInterval(()=>{timerVal--;updateTimerUI();if(timerVal<=0){clearInterval(timerInterval);timeUp();}},1000);
 }
 
@@ -396,15 +509,15 @@ function updateTimerUI(){
 
 function timeUp(){
   if(answered)return;
-  answered=true; hearts--; renderHearts();
-  showFeedback(false,null,true); disableOptions();
+  answered=true;hearts--;renderHearts();
+  showFeedback(false,null,true);disableOptions();
   if(hearts<=0){setTimeout(showGameOver,1300);return;}
   setTimeout(nextQuestion,1600);
 }
 
 function selectAnswer(idx){
   if(answered)return;
-  answered=true; clearInterval(timerInterval);
+  answered=true;clearInterval(timerInterval);
   const q=shuffledQuestions[currentQ];
   const isCorrect=idx===q.correct_index;
   const btns=document.querySelectorAll('.option-btn');
