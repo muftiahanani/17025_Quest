@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>17025 Quest – Belajar ISO/IEC 17025</title>
+<meta name="description" content="Belajar ISO/IEC 17025 dengan cara yang menyenangkan. Kuis interaktif untuk personel laboratorium.">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f3ff; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 1rem; }
+  #app { width: 100%; max-width: 480px; background: #ffffff; border-radius: 20px; padding: 1.5rem; min-height: 100vh; box-shadow: 0 4px 24px rgba(83,74,183,0.10); }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* HOME */
+  .home-header { text-align: center; padding: 2rem 1rem 1.5rem; }
+  .logo { font-size: 2rem; font-weight: 700; color: #534AB7; letter-spacing: -0.5px; }
+  .logo span { color: #D4537E; }
+  .tagline { font-size: 13px; color: #888780; margin-top: 6px; }
+  .home-sub { font-size: 14px; color: #5F5E5A; margin: 1rem 0 0.5rem; font-weight: 600; }
+  .level-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0.5rem 0 1.5rem; }
+  .level-card { background: #fff; border: 1.5px solid #E8E6F8; border-radius: 14px; padding: 1rem; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; text-align: center; }
+  .level-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(83,74,183,0.12); }
+  .level-icon { font-size: 2rem; margin-bottom: 8px; }
+  .level-num { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 2px; }
+  .level-name { font-size: 12px; color: #5F5E5A; line-height: 1.4; }
+  .level-badge { display: inline-block; font-size: 11px; padding: 2px 10px; border-radius: 20px; margin-top: 8px; font-weight: 600; }
+  .footer-note { text-align: center; font-size: 11px; color: #B4B2A9; padding: 0.5rem 0 0.25rem; }
+
+  /* QUIZ */
+  .quiz-header { display: flex; align-items: center; justify-content: space-between; padding: 0 0 1rem; border-bottom: 1.5px solid #F1EFE8; margin-bottom: 1.25rem; }
+  .hearts { display: flex; gap: 3px; font-size: 20px; }
+  .xp-badge { background: #EEEDFE; color: #534AB7; font-size: 13px; font-weight: 700; padding: 4px 14px; border-radius: 20px; }
+  .timer-circle { position: relative; width: 44px; height: 44px; }
+  .timer-svg { transform: rotate(-90deg); }
+  .timer-num { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 13px; font-weight: 700; color: #444441; }
+  .progress-wrap { margin-bottom: 1.25rem; }
+  .progress-label { font-size: 11px; color: #888780; margin-bottom: 4px; }
+  .progress-bar { height: 8px; background: #F1EFE8; border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #7F77DD, #D4537E); border-radius: 4px; transition: width 0.35s; }
+  .question-text { font-size: 17px; font-weight: 600; color: #2C2C2A; line-height: 1.55; margin-bottom: 1.5rem; min-height: 80px; }
+  .options { display: grid; gap: 10px; }
+  .option-btn { background: #fff; border: 1.5px solid #E8E6F8; border-radius: 12px; padding: 13px 16px; text-align: left; font-size: 14px; color: #2C2C2A; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 10px; width: 100%; }
+  .option-btn:hover:not(:disabled) { border-color: #7F77DD; background: #EEEDFE; color: #3C3489; }
+  .option-btn.correct { background: #EAF3DE; border-color: #639922; color: #27500A; }
+  .option-btn.wrong { background: #FCEBEB; border-color: #A32D2D; color: #501313; }
+  .option-btn:disabled { cursor: default; }
+  .opt-letter { width: 28px; height: 28px; border-radius: 50%; background: #F1EFE8; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; color: #5F5E5A; }
+  .option-btn.correct .opt-letter { background: #639922; color: #fff; }
+  .option-btn.wrong .opt-letter { background: #A32D2D; color: #fff; }
+  .feedback { margin-top: 1rem; padding: 12px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; }
+  .feedback.correct { background: #EAF3DE; color: #27500A; }
+  .feedback.wrong { background: #FCEBEB; color: #501313; }
+
+  /* RESULT / GAMEOVER */
+  .center-wrap { text-align: center; padding: 2.5rem 1rem; }
+  .big-icon { font-size: 4.5rem; margin-bottom: 1rem; }
+  .result-title { font-size: 24px; font-weight: 700; color: #2C2C2A; margin-bottom: 6px; }
+  .result-sub { font-size: 13px; color: #888780; margin-bottom: 1.5rem; }
+  .score-display { font-size: 3.5rem; font-weight: 700; color: #534AB7; margin: 0.5rem 0; }
+  .stars { font-size: 2.2rem; margin: 0.25rem 0 1.25rem; }
+  .xp-earned { display: inline-block; background: #EEEDFE; color: #534AB7; font-size: 16px; font-weight: 700; padding: 8px 24px; border-radius: 20px; margin-bottom: 1.5rem; }
+  .btn-primary { display: block; background: #534AB7; color: #fff; border: none; border-radius: 14px; padding: 15px 28px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 10px; transition: background 0.15s; }
+  .btn-primary:hover { background: #3C3489; }
+  .btn-secondary { display: block; background: transparent; color: #534AB7; border: 2px solid #534AB7; border-radius: 14px; padding: 13px 28px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: background 0.15s; }
+  .btn-secondary:hover { background: #EEEDFE; }
+
+  @media (max-width: 380px) {
+    #app { padding: 1rem; border-radius: 0; min-height: 100vh; }
+    .level-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="home" class="screen active">
+    <div class="home-header">
+      <div class="logo">17025 <span>Quest</span></div>
+      <div class="tagline">Belajar ISO/IEC 17025 dengan cara yang menyenangkan 🔬</div>
+    </div>
+    <div class="home-sub">Pilih Level</div>
+    <div class="level-grid" id="levelGrid"></div>
+    <div class="footer-note">5 level · 50 soal · Gratis · Tanpa login</div>
+  </div>
+
+  <div id="quiz" class="screen">
+    <div class="quiz-header">
+      <div class="hearts" id="hearts"></div>
+      <div class="timer-circle">
+        <svg class="timer-svg" width="44" height="44" viewBox="0 0 44 44">
+          <circle cx="22" cy="22" r="18" fill="none" stroke="#E8E6F8" stroke-width="3.5"/>
+          <circle id="timerArc" cx="22" cy="22" r="18" fill="none" stroke="#534AB7" stroke-width="3.5"
+            stroke-dasharray="113.1" stroke-dashoffset="0" stroke-linecap="round"/>
+        </svg>
+        <div class="timer-num" id="timerNum">15</div>
+      </div>
+      <div class="xp-badge" id="xpBadge">0 XP</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label" id="questionNum">Soal 1 dari 10</div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="question-text" id="questionText"></div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback" style="display:none"></div>
+  </div>
+
+  <div id="gameover" class="screen">
+    <div class="center-wrap">
+      <div class="big-icon">💔</div>
+      <div class="result-title">Hati habis!</div>
+      <div class="result-sub" id="gameoverSub"></div>
+      <button class="btn-primary" onclick="retryLevel()">Coba Lagi</button>
+      <button class="btn-secondary" onclick="goHome()">Pilih Level Lain</button>
+    </div>
+  </div>
+
+  <div id="result" class="screen">
+    <div class="center-wrap">
+      <div class="big-icon" id="resultIcon"></div>
+      <div class="result-title" id="resultTitle"></div>
+      <div class="score-display" id="resultScore"></div>
+      <div class="stars" id="resultStars"></div>
+      <div class="xp-earned" id="resultXP"></div>
+      <div class="result-sub" id="resultSub"></div>
+      <button class="btn-primary" onclick="retryLevel()">Main Lagi</button>
+      <button class="btn-secondary" onclick="goHome()">Pilih Level Lain</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const LEVELS = [
+  { name: "Dasar ISO/IEC 17025", icon: "🔬", color: "#EEEDFE", accent: "#534AB7" },
+  { name: "Persyaratan Umum", icon: "⚖️", color: "#E1F5EE", accent: "#1D9E75" },
+  { name: "Sumber Daya", icon: "🛠️", color: "#FAECE7", accent: "#D85A30" },
+  { name: "Persyaratan Proses", icon: "🔄", color: "#FBEAF0", accent: "#D4537E" },
+  { name: "Sistem Manajemen", icon: "📋", color: "#E6F1FB", accent: "#378ADD" },
+];
+
+const ALL_QUESTIONS = [
+  { q: "Apa tujuan utama ISO/IEC 17025?", opts: ["Meningkatkan penjualan laboratorium","Menjamin kompetensi laboratorium","Mengurangi biaya operasional","Meningkatkan jumlah pegawai"], ans: 1 },
+  { q: "ISO/IEC 17025 berlaku untuk?", opts: ["Rumah sakit","Sekolah","Laboratorium pengujian dan kalibrasi","Hotel"], ans: 2 },
+  { q: "Akreditasi laboratorium menunjukkan bahwa laboratorium?", opts: ["Memiliki gedung besar","Memiliki alat mahal","Kompeten melakukan pengujian tertentu","Memiliki banyak pegawai"], ans: 2 },
+  { q: "Di Indonesia, lembaga akreditasi laboratorium adalah?", opts: ["BPOM","KAN","BRIN","BPS"], ans: 1 },
+  { q: "Hasil pengujian yang baik harus?", opts: ["Cepat saja","Murah saja","Valid dan dapat dipercaya","Banyak jumlahnya"], ans: 2 },
+  { q: "Personel laboratorium harus?", opts: ["Kompeten","Populer","Banyak teman","Berpengalaman 30 tahun"], ans: 0 },
+  { q: "Laboratorium harus memiliki?", opts: ["Sistem manajemen yang sesuai","Kafe","Tempat parkir luas","Kantin"], ans: 0 },
+  { q: "Kalibrasi membantu memastikan?", opts: ["Ketertelusuran hasil pengukuran","Penjualan meningkat","Laboratorium terkenal","Jumlah pelanggan bertambah"], ans: 0 },
+  { q: "Audit internal bertujuan untuk?", opts: ["Menghukum pegawai","Mencari kesalahan pribadi","Mengevaluasi sistem laboratorium","Mengurangi pekerjaan"], ans: 2 },
+  { q: "ISO 17025 berfokus pada?", opts: ["Kompetensi laboratorium","Produksi barang","Pemasaran","Keuangan"], ans: 0 },
+  { q: "Imparsialitas berarti?", opts: ["Memihak pelanggan","Bersikap netral dan objektif","Mengikuti keinginan atasan","Mengikuti mayoritas"], ans: 1 },
+  { q: "Laboratorium harus menghindari?", opts: ["Konflik kepentingan","Kalibrasi","Pelatihan","Audit"], ans: 0 },
+  { q: "Data pelanggan harus?", opts: ["Dipublikasikan","Dijaga kerahasiaannya","Dibagikan ke semua pegawai","Dikirim ke media sosial"], ans: 1 },
+  { q: "Kerahasiaan informasi pelanggan merupakan?", opts: ["Kewajiban laboratorium","Pilihan laboratorium","Tugas pelanggan","Tugas auditor"], ans: 0 },
+  { q: "Personel harus melaporkan potensi?", opts: ["Konflik kepentingan","Promosi","Penjualan","Bonus"], ans: 0 },
+  { q: "Laboratorium harus menjaga?", opts: ["Objektivitas hasil","Popularitas","Omset","Jumlah pegawai"], ans: 0 },
+  { q: "Hasil pengujian tidak boleh dipengaruhi oleh?", opts: ["Tekanan eksternal","SOP","Metode uji","Kalibrasi"], ans: 0 },
+  { q: "Informasi pelanggan dapat dibuka jika?", opts: ["Ada dasar hukum atau persetujuan","Auditor meminta sembarang","Teman meminta","Pegawai ingin tahu"], ans: 0 },
+  { q: "Imparsialitas berkaitan dengan?", opts: ["Ketidakberpihakan","Kecepatan kerja","Pengadaan barang","Inventaris"], ans: 0 },
+  { q: "Persyaratan umum menekankan?", opts: ["Integritas laboratorium","Keuntungan bisnis","Pemasaran","Produksi"], ans: 0 },
+  { q: "Personel harus memiliki?", opts: ["Kompetensi yang sesuai","Seragam baru","Jabatan tinggi","Banyak pengalaman"], ans: 0 },
+  { q: "Peralatan harus?", opts: ["Sesuai tujuan penggunaan","Baru semua","Mahal","Impor"], ans: 0 },
+  { q: "Kalibrasi dilakukan untuk?", opts: ["Menjamin keakuratan hasil","Menambah pelanggan","Menghemat listrik","Mengurangi pegawai"], ans: 0 },
+  { q: "Laboratorium harus memiliki catatan?", opts: ["Kompetensi personel","Makanan favorit pegawai","Hobi pegawai","Tempat tinggal pegawai"], ans: 0 },
+  { q: "Bahan acuan digunakan untuk?", opts: ["Menjamin mutu hasil pengujian","Dekorasi laboratorium","Pelengkap laporan","Penyimpanan data"], ans: 0 },
+  { q: "Lingkungan laboratorium harus?", opts: ["Mendukung kegiatan pengujian","Selalu dingin","Selalu panas","Selalu tertutup"], ans: 0 },
+  { q: "Peralatan yang rusak harus?", opts: ["Dikendalikan penggunaannya","Tetap dipakai","Disimpan tanpa label","Dipinjamkan"], ans: 0 },
+  { q: "Ketertelusuran pengukuran penting untuk?", opts: ["Kepercayaan hasil uji","Promosi laboratorium","Pengadaan barang","Kenaikan jabatan"], ans: 0 },
+  { q: "Pelatihan personel bertujuan untuk?", opts: ["Meningkatkan kompetensi","Menambah pekerjaan","Mengurangi audit","Mengurangi SOP"], ans: 0 },
+  { q: "Peralatan harus dipelihara agar?", opts: ["Tetap berfungsi baik","Terlihat baru","Tidak dipakai","Lebih mahal"], ans: 0 },
+  { q: "Metode pengujian harus?", opts: ["Sesuai dan tervalidasi","Cepat saja","Murah saja","Populer"], ans: 0 },
+  { q: "Sampel harus diidentifikasi dengan?", opts: ["Jelas dan unik","Warna favorit","Nama petugas saja","Nomor acak tanpa catatan"], ans: 0 },
+  { q: "Tujuan validasi metode adalah?", opts: ["Membuktikan metode sesuai penggunaan","Mempercepat pekerjaan","Mengurangi biaya","Menambah laporan"], ans: 0 },
+  { q: "Data hasil uji harus?", opts: ["Dicatat dengan benar","Diingat saja","Dihapus setelah selesai","Disimpan oleh satu orang"], ans: 0 },
+  { q: "Pengendalian mutu dilakukan untuk?", opts: ["Memantau keabsahan hasil","Menambah pekerjaan","Menambah biaya","Mengurangi alat"], ans: 0 },
+  { q: "Ketika terjadi penyimpangan, laboratorium harus?", opts: ["Menindaklanjuti dan mengevaluasi","Mengabaikan","Menyembunyikan","Menghapus data"], ans: 0 },
+  { q: "Laporan hasil harus?", opts: ["Jelas dan akurat","Panjang","Berwarna","Banyak gambar"], ans: 0 },
+  { q: "Pengulangan pengujian dapat digunakan untuk?", opts: ["Memeriksa konsistensi hasil","Menambah laporan","Mengurangi waktu kerja","Mengurangi data"], ans: 0 },
+  { q: "Uji profisiensi digunakan untuk?", opts: ["Evaluasi kinerja laboratorium","Pemasaran","Rekrutmen pegawai","Pengadaan alat"], ans: 0 },
+  { q: "Data teknis harus?", opts: ["Dapat ditelusuri kembali","Dirahasiakan dari semua orang","Dihapus cepat","Dicetak saja"], ans: 0 },
+  { q: "Audit internal dilakukan secara?", opts: ["Berkala","Sekali saja","Saat ada tamu","Saat alat rusak"], ans: 0 },
+  { q: "Tinjauan manajemen dilakukan oleh?", opts: ["Manajemen laboratorium","Pelanggan","Supplier","Satpam"], ans: 0 },
+  { q: "Tujuan tindakan perbaikan adalah?", opts: ["Mencegah terulangnya masalah","Menyalahkan pegawai","Menambah dokumen","Mengurangi pekerjaan"], ans: 0 },
+  { q: "Dokumen harus?", opts: ["Dikendalikan","Dibiarkan bebas","Tidak diberi nomor","Disimpan acak"], ans: 0 },
+  { q: "Risiko dan peluang perlu?", opts: ["Dipertimbangkan","Diabaikan","Dihapus","Disembunyikan"], ans: 0 },
+  { q: "Ketidaksesuaian harus?", opts: ["Ditangani dan dicatat","Dilupakan","Disembunyikan","Dihapus"], ans: 0 },
+  { q: "Perbaikan berkelanjutan bertujuan untuk?", opts: ["Meningkatkan efektivitas sistem","Menambah dokumen","Mengurangi pegawai","Menambah rapat"], ans: 0 },
+  { q: "Rekaman mutu harus?", opts: ["Dipelihara dengan baik","Dihapus cepat","Dipinjam bebas","Tidak perlu disimpan"], ans: 0 },
+  { q: "Hasil audit internal menjadi masukan bagi?", opts: ["Tinjauan manajemen","Pengadaan barang","Pemasaran","Rekrutmen"], ans: 0 },
+  { q: "Tujuan sistem manajemen laboratorium adalah?", opts: ["Menjamin mutu dan kompetensi laboratorium","Menambah pelanggan","Menambah alat","Menambah gedung"], ans: 0 },
+];
+
+let currentLevel = 0, currentQ = 0, hearts = 5, xp = 0, correct = 0;
+let timerVal = 15, timerInterval = null, answered = false;
+let levelScores = [null,null,null,null,null];
+
+function getQuestions(lv) { return ALL_QUESTIONS.slice(lv*10, lv*10+10); }
+
+function renderHome() {
+  const grid = document.getElementById('levelGrid');
+  grid.innerHTML = '';
+  LEVELS.forEach((lv, i) => {
+    const sc = levelScores[i];
+    const div = document.createElement('div');
+    div.className = 'level-card';
+    div.style.borderTop = `3px solid ${lv.accent}`;
+    const stars = sc !== null ? (sc >= 9 ? '⭐⭐⭐' : sc >= 7 ? '⭐⭐' : sc >= 5 ? '⭐' : '—') : '';
+    div.innerHTML = `
+      <div class="level-icon">${lv.icon}</div>
+      <div class="level-num" style="color:${lv.accent}">Level ${i+1}</div>
+      <div class="level-name">${lv.name}</div>
+      <div class="level-badge" style="background:${lv.color};color:${lv.accent}">${sc !== null ? stars+' '+sc+'/10' : 'Mulai →'}</div>
+    `;
+    div.onclick = () => startLevel(i);
+    grid.appendChild(div);
+  });
+}
+
+function startLevel(lvIdx) {
+  currentLevel = lvIdx; currentQ = 0; hearts = 5; xp = 0; correct = 0;
+  showScreen('quiz'); renderQuestion();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function renderHearts() {
+  document.getElementById('hearts').innerHTML = Array.from({length:5},(_,i)=>i<hearts?'❤️':'🤍').join('');
+}
+
+function renderQuestion() {
+  const q = getQuestions(currentLevel)[currentQ];
+  answered = false;
+  document.getElementById('questionNum').textContent = `Soal ${currentQ+1} dari 10`;
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('progressFill').style.width = `${(currentQ/10)*100}%`;
+  document.getElementById('xpBadge').textContent = `${xp} XP`;
+  document.getElementById('feedback').style.display = 'none';
+  renderHearts();
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  ['A','B','C','D'].forEach((letter, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-letter">${letter}</span>${q.opts[i]}`;
+    btn.onclick = () => selectAnswer(i);
+    opts.appendChild(btn);
+  });
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerVal = 15; updateTimerUI();
+  timerInterval = setInterval(() => {
+    timerVal--;
+    updateTimerUI();
+    if (timerVal <= 0) { clearInterval(timerInterval); timeUp(); }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  document.getElementById('timerNum').textContent = timerVal;
+  const arc = document.getElementById('timerArc');
+  arc.style.strokeDashoffset = 113.1 * (1 - timerVal/15);
+  arc.style.stroke = timerVal <= 5 ? '#E24B4A' : '#534AB7';
+}
+
+function timeUp() {
+  if (answered) return;
+  answered = true;
+  hearts--; renderHearts();
+  showFeedback(false, null);
+  disableOptions();
+  if (hearts <= 0) { setTimeout(showGameOver, 1300); return; }
+  setTimeout(nextQuestion, 1600);
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerInterval);
+  const q = getQuestions(currentLevel)[currentQ];
+  const isCorrect = idx === q.ans;
+  const btns = document.querySelectorAll('.option-btn');
+  btns[idx].classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) btns[q.ans].classList.add('correct');
+  disableOptions();
+  if (isCorrect) { xp += 10; correct++; showFeedback(true, null); }
+  else { hearts--; renderHearts(); showFeedback(false, q.opts[q.ans]); }
+  document.getElementById('xpBadge').textContent = `${xp} XP`;
+  if (hearts <= 0) { setTimeout(showGameOver, 1300); return; }
+  setTimeout(nextQuestion, 1600);
+}
+
+function showFeedback(isCorrect, correctAnswer) {
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'block';
+  if (isCorrect) { fb.className = 'feedback correct'; fb.textContent = '✅ Benar! +10 XP'; }
+  else if (correctAnswer) { fb.className = 'feedback wrong'; fb.textContent = `❌ Jawaban benar: ${correctAnswer}`; }
+  else { fb.className = 'feedback wrong'; fb.textContent = '⏰ Waktu habis! Hati berkurang.'; }
+}
+
+function disableOptions() { document.querySelectorAll('.option-btn').forEach(b => b.disabled = true); }
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= 10) { showResult(); return; }
+  renderQuestion();
+}
+
+function showGameOver() {
+  clearInterval(timerInterval);
+  document.getElementById('gameoverSub').textContent = `Soal ${currentQ+1} dari 10 • ${correct} jawaban benar`;
+  showScreen('gameover');
+}
+
+function showResult() {
+  clearInterval(timerInterval);
+  levelScores[currentLevel] = correct;
+  const stars = correct>=9?'⭐⭐⭐':correct>=7?'⭐⭐':correct>=5?'⭐':'💪';
+  const icon = correct>=8?'🎉':correct>=5?'👍':'📚';
+  const msg = correct>=9?'Luar biasa!':correct>=7?'Bagus sekali!':correct>=5?'Cukup baik!':'Terus belajar!';
+  document.getElementById('resultIcon').textContent = icon;
+  document.getElementById('resultTitle').textContent = msg;
+  document.getElementById('resultScore').textContent = `${correct}/10`;
+  document.getElementById('resultStars').textContent = stars;
+  document.getElementById('resultXP').textContent = `+${xp} XP diperoleh`;
+  document.getElementById('resultSub').textContent = `Level ${currentLevel+1}: ${LEVELS[currentLevel].name}`;
+  showScreen('result');
+  renderHome();
+}
+
+function retryLevel() { startLevel(currentLevel); }
+function goHome() { showScreen('home'); }
+
+renderHome();
+</script>
+</body>
+</html>
