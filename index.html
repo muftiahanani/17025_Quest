@@ -25,7 +25,6 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
 .btn-primary:hover{background:#3C3489}.btn-primary:disabled{background:#B4B2A9;cursor:default}
 .auth-msg{font-size:13px;text-align:center;margin-top:1rem;min-height:20px}
 .auth-msg.error{color:#A32D2D}.auth-msg.success{color:#27500A}
-/* HOME */
 .home-header{text-align:center;padding:1.5rem 0 1rem}
 .user-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1.5px solid #F1EFE8}
 .user-name{font-size:13px;color:#5F5E5A;font-weight:600}
@@ -42,7 +41,6 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
 .no-lives-title{font-size:15px;font-weight:700;color:#501313;margin-bottom:4px}
 .no-lives-sub{font-size:13px;color:#A32D2D}
 .no-lives-countdown{font-size:20px;font-weight:700;color:#A32D2D;margin-top:6px}
-/* WORLDS */
 .world-list{display:grid;gap:14px;padding-bottom:1rem}
 .world-card{border:1.5px solid #E8E6F8;border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s}
 .world-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(83,74,183,.1)}
@@ -57,7 +55,6 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
 .level-dot.done{background:#EAF3DE;border-color:#639922;color:#27500A}
 .level-dot.unlocked{background:#EEEDFE;border-color:#7F77DD;color:#534AB7}
 .level-dot.locked{background:#F1EFE8;color:#B4B2A9}
-/* LEVEL SELECT */
 .back-btn{background:none;border:none;font-size:13px;color:#534AB7;cursor:pointer;padding:0 0 1rem;font-weight:600}
 .level-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:.5rem 0}
 .level-card{background:#fff;border:1.5px solid #E8E6F8;border-radius:14px;padding:1rem;cursor:pointer;transition:transform .15s;text-align:center}
@@ -67,7 +64,6 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
 .lc-num{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 .lc-name{font-size:12px;color:#5F5E5A;line-height:1.4}
 .lc-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;margin-top:6px;font-weight:600}
-/* QUIZ */
 .quiz-header{display:flex;align-items:center;justify-content:space-between;padding:0 0 1rem;border-bottom:1.5px solid #F1EFE8;margin-bottom:1.25rem}
 .hearts{display:flex;gap:3px;font-size:20px}
 .xp-badge{background:#EEEDFE;color:#534AB7;font-size:13px;font-weight:700;padding:4px 14px;border-radius:20px}
@@ -91,7 +87,6 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
 .feedback{margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:600}
 .feedback.correct{background:#EAF3DE;color:#27500A}
 .feedback.wrong{background:#FCEBEB;color:#501313}
-/* RESULT */
 .center-wrap{text-align:center;padding:2.5rem 1rem}
 .big-icon{font-size:4.5rem;margin-bottom:1rem}
 .result-title{font-size:24px;font-weight:700;color:#2C2C2A;margin-bottom:6px}
@@ -104,7 +99,6 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
 .btn-secondary{display:block;background:transparent;color:#534AB7;border:2px solid #534AB7;border-radius:12px;padding:13px;font-size:15px;font-weight:600;cursor:pointer;width:100%;margin-top:10px;transition:background .15s}
 .btn-secondary:hover{background:#EEEDFE}
 .loading{text-align:center;padding:3rem;color:#888;font-size:14px}
-/* RANKING */
 .rank-header{text-align:center;padding:1rem 0 1.5rem}
 .rank-title{font-size:20px;font-weight:700;color:#2C2C2A}
 .rank-sub{font-size:13px;color:#888;margin-top:4px}
@@ -128,13 +122,25 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
 .profile-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#534AB7,#D4537E);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:#fff;margin:0 auto 12px}
 .profile-nickname{font-size:20px;font-weight:700;color:#2C2C2A}
 .profile-email{font-size:13px;color:#888;margin-top:4px}
-.profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:1.25rem 0}
-.stat-card{background:#F5F3FF;border-radius:12px;padding:1rem;text-align:center}
-.stat-val{font-size:24px;font-weight:700;color:#534AB7}
-.stat-label{font-size:11px;color:#888;margin-top:4px}
-.profile-lives{background:#FEF0F5;border-radius:12px;padding:1rem;text-align:center;margin-bottom:1.25rem}
+.profile-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:1.25rem 0}
+.stat-card{background:#F5F3FF;border-radius:12px;padding:.75rem;text-align:center}
+.stat-val{font-size:20px;font-weight:700;color:#534AB7}
+.stat-label{font-size:10px;color:#888;margin-top:4px;line-height:1.3}
+.profile-lives{background:#FEF0F5;border-radius:12px;padding:1rem;text-align:center;margin-bottom:1rem}
 .profile-lives-val{font-size:20px;margin-bottom:4px}
 .profile-lives-label{font-size:12px;color:#D4537E;font-weight:600}
+/* STATISTIK KLAUSUL */
+.stat-section{margin-bottom:1.25rem}
+.stat-section-title{font-size:14px;font-weight:700;color:#2C2C2A;margin-bottom:10px}
+.clause-bar-wrap{margin-bottom:8px}
+.clause-bar-header{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.clause-bar-name{color:#5F5E5A;font-weight:600}
+.clause-bar-pct{font-weight:700}
+.clause-bar-bg{height:8px;background:#F1EFE8;border-radius:4px;overflow:hidden}
+.clause-bar-fill{height:100%;border-radius:4px;transition:width .5s}
+.best-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:#EAF3DE;color:#27500A;font-weight:600;margin-left:6px}
+.weak-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:#FCEBEB;color:#501313;font-weight:600;margin-left:6px}
+/* EDIT */
 .edit-section{background:#F5F3FF;border-radius:14px;padding:1.25rem;margin-bottom:1rem}
 .edit-title{font-size:14px;font-weight:700;color:#2C2C2A;margin-bottom:1rem}
 .save-msg{font-size:13px;text-align:center;margin-top:.75rem;min-height:18px}
@@ -143,13 +149,9 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
 </head>
 <body>
 <div id="app">
-
   <div id="auth" class="screen active">
     <div class="auth-wrap">
-      <div class="auth-header">
-        <h1>17025 <span>Quest</span></h1>
-        <div class="tagline">Belajar ISO/IEC 17025 dengan cara yang menyenangkan 🔬</div>
-      </div>
+      <div class="auth-header"><h1>17025 <span>Quest</span></h1><div class="tagline">Belajar ISO/IEC 17025 dengan cara yang menyenangkan 🔬</div></div>
       <div class="tab-row">
         <button class="tab-btn active" onclick="switchTab('login')">Masuk</button>
         <button class="tab-btn" onclick="switchTab('register')">Daftar</button>
@@ -170,10 +172,7 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
   </div>
 
   <div id="home" class="screen">
-    <div class="home-header">
-      <h1>17025 <span>Quest</span></h1>
-      <div class="tagline">Pilih dunia untuk mulai belajar</div>
-    </div>
+    <div class="home-header"><h1>17025 <span>Quest</span></h1><div class="tagline">Pilih dunia untuk mulai belajar</div></div>
     <div class="user-bar">
       <div>
         <div class="user-name" id="userName"></div>
@@ -193,14 +192,9 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
       <button class="nav-btn active" onclick="showTab('worlds')">🗺️ Peta Dunia</button>
       <button class="nav-btn" onclick="showTab('ranking')">🏆 Ranking</button>
     </div>
-    <div id="tabWorlds">
-      <div class="world-list" id="worldList"><div class="loading">Memuat...</div></div>
-    </div>
+    <div id="tabWorlds"><div class="world-list" id="worldList"><div class="loading">Memuat...</div></div></div>
     <div id="tabRanking" style="display:none">
-      <div class="rank-header">
-        <div class="rank-title">🏆 Papan Peringkat</div>
-        <div class="rank-sub">Urutan: level selesai → XP</div>
-      </div>
+      <div class="rank-header"><div class="rank-title">🏆 Papan Peringkat</div><div class="rank-sub">Urutan: level selesai → XP</div></div>
       <div class="rank-list" id="rankList"><div class="loading">Memuat...</div></div>
     </div>
   </div>
@@ -216,10 +210,19 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
       <div class="profile-stats">
         <div class="stat-card"><div class="stat-val" id="profileXP">0</div><div class="stat-label">Total XP</div></div>
         <div class="stat-card"><div class="stat-val" id="profileLevels">0</div><div class="stat-label">Level Selesai</div></div>
+        <div class="stat-card"><div class="stat-val" id="profileAccuracy">-</div><div class="stat-label">Akurasi</div></div>
       </div>
-      <div class="profile-lives">
+      <div class="profile-stats" style="grid-template-columns:1fr 1fr;margin-top:0">
+        <div class="stat-card"><div class="stat-val" id="profileTotalQ">0</div><div class="stat-label">Total Soal Dijawab</div></div>
+        <div class="stat-card"><div class="stat-val" id="profileAttempts">0</div><div class="stat-label">Total Sesi Main</div></div>
+      </div>
+      <div class="profile-lives" style="margin-top:1rem">
         <div class="profile-lives-val" id="profileLivesVal">❤️❤️❤️❤️❤️</div>
         <div class="profile-lives-label">Hati Utama</div>
+      </div>
+      <div class="stat-section" id="clauseStats" style="display:none">
+        <div class="stat-section-title">📊 Akurasi per Dunia</div>
+        <div id="clauseBarList"></div>
       </div>
       <div class="edit-section">
         <div class="edit-title">✏️ Edit Profil</div>
@@ -285,20 +288,21 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
       <button class="btn-secondary" style="margin-top:6px" onclick="showScreen('home')">Peta Dunia</button>
     </div>
   </div>
-
 </div>
+
 <script>
 const SUPABASE_URL='https://omvoqbctacdkwyjbzknx.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tdm9xYmN0YWNka3d5amJ6a254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzUwNjcsImV4cCI6MjA5NzQxMTA2N30.2dh5DFKtWBqaTxH3dx9HVZl6IePq52FPvzDTj-8UBe4';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const WORLD_COLORS=['#534AB7','#1D9E75','#5F5E5A','#D85A30','#D4537E','#378ADD','#639922'];
 const WORLD_BG=['#EEEDFE','#E1F5EE','#F1EFE8','#FAECE7','#FBEAF0','#E6F1FB','#EAF3DE'];
-const MAX_LIVES=5, LIFE_REGEN_MS=10*60*1000;
+const MAX_LIVES=5,LIFE_REGEN_MS=10*60*1000;
 
 let currentUser=null,worlds=[],allLevels=[],allProgress=[],userProfile=null;
 let currentWorld=null,currentLevel=null,currentWorldIndex=0;
 let shuffledQuestions=[],currentQ=0,levelHearts=3,xp=0,correct=0;
 let timerVal=15,timerInterval=null,answered=false,livesTimerInterval=null;
+let sessionAnswers=[],currentAttemptId=null;
 
 // ── AUTH ──────────────────────────────────────────
 function switchTab(tab){
@@ -345,9 +349,7 @@ async function doLogout(){
   showScreen('auth');
 }
 
-async function afterLogin(){
-  await loadData();showScreen('home');
-}
+async function afterLogin(){await loadData();showScreen('home');}
 
 // ── DATA ──────────────────────────────────────────
 async function loadData(){
@@ -365,7 +367,6 @@ async function loadData(){
     await sb.from('profiles').upsert({id:currentUser.id,full_name:name,nickname:autoNick,lives:MAX_LIVES},{onConflict:'id'});
     userProfile={lives:MAX_LIVES,last_life_lost:null,full_name:name,nickname:autoNick};
   }
-  // Ensure nickname exists
   if(!userProfile.nickname){
     const autoNick=(userProfile.full_name||'').slice(0,3)+'***';
     userProfile.nickname=autoNick;
@@ -374,8 +375,7 @@ async function loadData(){
   regenLives();
   const displayName=userProfile.full_name||currentUser.user_metadata?.full_name||currentUser.email;
   document.getElementById('userName').textContent='👋 '+displayName;
-  renderHome();
-  startLivesTimer();
+  renderHome();startLivesTimer();
 }
 
 // ── LIVES ──────────────────────────────────────────
@@ -433,14 +433,9 @@ async function loseMainLife(){
   renderLivesUI();
 }
 
-// ── XP ────────────────────────────────────────────
-function getTotalXP(){
-  // XP dari best_score saja, anti farming
-  return allProgress.reduce((sum,p)=>sum+(p.best_score*10),0);
-}
-function getLevelsCompleted(){
-  return allProgress.filter(p=>p.best_score>=8).length;
-}
+// ── XP & STATS ──────────────────────────────────────
+function getTotalXP(){return allProgress.reduce((sum,p)=>sum+(p.best_score*10),0);}
+function getLevelsCompleted(){return allProgress.filter(p=>p.best_score>=8).length;}
 
 // ── UTIL ──────────────────────────────────────────
 function getProgress(levelId){return allProgress.find(p=>p.level_id===levelId)||null;}
@@ -470,7 +465,7 @@ function showTab(tab){
   if(tab==='ranking')loadRanking();
 }
 
-// ── PROFILE ──────────────────────────────────────
+// ── SCREEN ──────────────────────────────────────────
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -478,7 +473,8 @@ function showScreen(id){
   if(id==='profile')renderProfile();
 }
 
-function renderProfile(){
+// ── PROFILE ──────────────────────────────────────
+async function renderProfile(){
   const name=userProfile?.full_name||currentUser.user_metadata?.full_name||'';
   const nick=userProfile?.nickname||(name.slice(0,3)+'***');
   const initials=nick.slice(0,2).toUpperCase();
@@ -495,6 +491,76 @@ function renderProfile(){
   document.getElementById('editNickname').value=nick;
   document.getElementById('editEmail').value=currentUser.email;
   document.getElementById('saveMsg').textContent='';
+
+  // Load attempts stats
+  const {data:attData}=await sb.from('user_answers')
+    .select('is_correct,question_id')
+    .eq('user_id',currentUser.id);
+  const {data:attCount}=await sb.from('attempts')
+    .select('id',{count:'exact'})
+    .eq('user_id',currentUser.id);
+
+  const totalQ=attData?.length||0;
+  const totalCorrect=attData?.filter(a=>a.is_correct).length||0;
+  const accuracy=totalQ>0?Math.round(totalCorrect/totalQ*100):0;
+  const totalAttempts=attCount?.length||0;
+
+  document.getElementById('profileTotalQ').textContent=totalQ;
+  document.getElementById('profileAttempts').textContent=totalAttempts;
+  document.getElementById('profileAccuracy').textContent=totalQ>0?accuracy+'%':'-';
+
+  // Per-world accuracy
+  if(attData&&attData.length>0){
+    // Get question→level→world mapping
+    const qIds=[...new Set(attData.map(a=>a.question_id))];
+    const {data:qData}=await sb.from('questions').select('id,level_id').in('id',qIds);
+    const qMap={};(qData||[]).forEach(q=>{qMap[q.id]=q.level_id;});
+    const lvMap={};allLevels.forEach(l=>{lvMap[l.id]=l.world_id;});
+
+    // Aggregate per world
+    const worldStats={};
+    attData.forEach(a=>{
+      const lvId=qMap[a.question_id];
+      const wId=lvMap[lvId];
+      if(!wId)return;
+      if(!worldStats[wId]){worldStats[wId]={correct:0,total:0};}
+      worldStats[wId].total++;
+      if(a.is_correct)worldStats[wId].correct++;
+    });
+
+    const clauseSection=document.getElementById('clauseStats');
+    const barList=document.getElementById('clauseBarList');
+    barList.innerHTML='';
+
+    const worldEntries=worlds.map((w,wi)=>({
+      w,wi,
+      pct:worldStats[w.id]?Math.round(worldStats[w.id].correct/worldStats[w.id].total*100):null
+    })).filter(e=>e.pct!==null);
+
+    if(worldEntries.length>0){
+      clauseSection.style.display='block';
+      const best=worldEntries.reduce((a,b)=>a.pct>=b.pct?a:b);
+      const weak=worldEntries.reduce((a,b)=>a.pct<=b.pct?a:b);
+      worldEntries.forEach(({w,wi,pct})=>{
+        const color=WORLD_COLORS[wi]||'#534AB7';
+        const isBest=w.id===best.w.id;
+        const isWeak=w.id===weak.w.id&&worldEntries.length>1;
+        const badge=isBest?'<span class="best-badge">Terbaik</span>':isWeak?'<span class="weak-badge">Perlu Latihan</span>':'';
+        barList.innerHTML+=`
+          <div class="clause-bar-wrap">
+            <div class="clause-bar-header">
+              <span class="clause-bar-name">${w.icon||''} ${w.name}${badge}</span>
+              <span class="clause-bar-pct" style="color:${color}">${pct}%</span>
+            </div>
+            <div class="clause-bar-bg"><div class="clause-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+          </div>`;
+      });
+    } else {
+      clauseSection.style.display='none';
+    }
+  } else {
+    document.getElementById('clauseStats').style.display='none';
+  }
 }
 
 async function saveProfile(){
@@ -505,7 +571,7 @@ async function saveProfile(){
   const {error}=await sb.from('profiles').update({full_name:name,nickname:nick}).eq('id',currentUser.id);
   if(error){document.getElementById('saveMsg').textContent='Gagal menyimpan.';document.getElementById('saveMsg').className='save-msg error';return;}
   userProfile.full_name=name;userProfile.nickname=nick;
-  document.getElementById('userName').textContent='👋 '+nick;
+  document.getElementById('userName').textContent='👋 '+name;
   document.getElementById('profileNickname').textContent=nick;
   document.getElementById('profileAvatar').textContent=nick.slice(0,2).toUpperCase();
   document.getElementById('saveMsg').textContent='✅ Profil berhasil disimpan!';
@@ -528,7 +594,6 @@ async function loadRanking(){
     userXP[p.user_id]=(userXP[p.user_id]||0)+(p.best_score*10);
     if(p.best_score>=8)userLevels[p.user_id]=(userLevels[p.user_id]||0)+1;
   });
-  // Sort: level selesai DESC, then XP DESC
   const sorted=Object.keys(userXP).map(uid=>({uid,xp:userXP[uid],lv:userLevels[uid]||0}))
     .sort((a,b)=>b.lv-a.lv||b.xp-a.xp).slice(0,20);
   list.innerHTML='';
@@ -546,7 +611,7 @@ async function loadRanking(){
   });
 }
 
-// ── HOME ─────────────────────────────────────────
+// ── HOME ──────────────────────────────────────────
 function renderHome(){
   renderLivesUI();
   const list=document.getElementById('worldList');
@@ -610,13 +675,14 @@ function renderLevelGrid(levels,color){
   });
 }
 
-// ── QUIZ ─────────────────────────────────────────
+// ── QUIZ ──────────────────────────────────────────
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function getLevelConfig(level){if(level.order_num===5)return{maxQ:15,passing:12};return{maxQ:10,passing:8};}
 
 async function startLevel(level){
   if(getLives()<=0){alert('Hati utama habis!');return;}
   currentLevel=level;currentQ=0;levelHearts=3;xp=0;correct=0;
+  sessionAnswers=[];currentAttemptId=null;
   const cfg=getLevelConfig(level);
   const {data}=await sb.from('questions').select('*').eq('level_id',level.id);
   if(!data||data.length===0){alert('Soal belum tersedia.');return;}
@@ -625,7 +691,7 @@ async function startLevel(level){
     const opts=[...q.options];
     const correctOpt=opts[q.correct_index];
     const shuffledOpts=shuffle(opts);
-    return{...q,options:shuffledOpts,correct_index:shuffledOpts.indexOf(correctOpt)};
+    return{...q,options:shuffledOpts,correct_index:shuffledOpts.indexOf(correctOpt),orig_id:q.id};
   });
   showScreen('quiz');renderQuestion();
 }
@@ -667,6 +733,8 @@ function updateTimerUI(){
 function timeUp(){
   if(answered)return;
   answered=true;levelHearts--;renderHearts();
+  const q=shuffledQuestions[currentQ];
+  sessionAnswers.push({question_id:q.orig_id,selected_index:-1,is_correct:false});
   showFeedback(false,null,true);disableOptions();
   if(levelHearts<=0){setTimeout(()=>showGameOver(),1300);return;}
   setTimeout(nextQuestion,1600);
@@ -676,6 +744,7 @@ function selectAnswer(idx){
   answered=true;clearInterval(timerInterval);
   const q=shuffledQuestions[currentQ];
   const isCorrect=idx===q.correct_index;
+  sessionAnswers.push({question_id:q.orig_id,selected_index:idx,is_correct:isCorrect});
   const btns=document.querySelectorAll('.option-btn');
   btns[idx].classList.add(isCorrect?'correct':'wrong');
   if(!isCorrect)btns[q.correct_index].classList.add('correct');
@@ -695,9 +764,34 @@ function showFeedback(isCorrect,correctAnswer,isTimeout){
 function disableOptions(){document.querySelectorAll('.option-btn').forEach(b=>b.disabled=true);}
 function nextQuestion(){currentQ++;if(currentQ>=shuffledQuestions.length){showResult();return;}renderQuestion();}
 
+async function saveAttempt(score,heartsLeft){
+  const cfg=getLevelConfig(currentLevel);
+  const {data}=await sb.from('attempts').insert({
+    user_id:currentUser.id,
+    level_id:currentLevel.id,
+    score,
+    max_score:cfg.maxQ,
+    hearts_left:heartsLeft,
+    played_at:new Date().toISOString()
+  }).select('id').single();
+  if(data)currentAttemptId=data.id;
+  // Save answers
+  if(currentAttemptId&&sessionAnswers.length>0){
+    const rows=sessionAnswers.map(a=>({
+      user_id:currentUser.id,
+      attempt_id:currentAttemptId,
+      question_id:a.question_id,
+      selected_index:a.selected_index,
+      is_correct:a.is_correct,
+      answered_at:new Date().toISOString()
+    }));
+    await sb.from('user_answers').insert(rows);
+  }
+}
+
 async function showGameOver(){
   clearInterval(timerInterval);
-  await loseMainLife();
+  await Promise.all([loseMainLife(),saveAttempt(correct,0)]);
   document.getElementById('gameoverSub').textContent=`Soal ${currentQ+1} • ${correct} jawaban benar • Hati utama: ${getLives()}/${MAX_LIVES}`;
   showScreen('gameover');
 }
@@ -730,7 +824,7 @@ async function showResult(){
   } else {
     nextBtn.style.display='none';retryBtn.style.display='block';
   }
-  await saveProgress(correct,passed,passing);
+  await Promise.all([saveAttempt(correct,levelHearts),saveProgress(correct,passed,passing)]);
   await loadData();
   showScreen('result');
 }
