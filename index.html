@@ -372,7 +372,7 @@ async function loadData(){
     await sb.from('profiles').update({nickname:autoNick}).eq('id',currentUser.id);
   }
   regenLives();
-  const displayName=userProfile.nickname||userProfile.full_name||currentUser.email;
+  const displayName=userProfile.full_name||currentUser.user_metadata?.full_name||currentUser.email;
   document.getElementById('userName').textContent='👋 '+displayName;
   renderHome();
   startLivesTimer();
