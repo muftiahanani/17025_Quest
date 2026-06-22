@@ -215,6 +215,7 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
       <div class="profile-stats" style="grid-template-columns:1fr 1fr;margin-top:0">
         <div class="stat-card"><div class="stat-val" id="profileTotalQ">0</div><div class="stat-label">Total Soal Dijawab</div></div>
         <div class="stat-card"><div class="stat-val" id="profileAttempts">0</div><div class="stat-label">Total Sesi Main</div></div>
+        <div class="stat-card"><div class="stat-val" id="profileDuration" style="font-size:14px">-</div><div class="stat-label">Total Waktu Belajar</div></div>
       </div>
       <div class="profile-lives" style="margin-top:1rem">
         <div class="profile-lives-val" id="profileLivesVal">❤️❤️❤️❤️❤️</div>
@@ -303,6 +304,7 @@ let currentWorld=null,currentLevel=null,currentWorldIndex=0;
 let shuffledQuestions=[],currentQ=0,levelHearts=3,xp=0,correct=0;
 let timerVal=15,timerInterval=null,answered=false,livesTimerInterval=null;
 let sessionAnswers=[],currentAttemptId=null;
+let levelStartedAt=null,questionStartedAt=null;
 
 // ── AUTH ──────────────────────────────────────────
 function switchTab(tab){
@@ -507,6 +509,14 @@ async function renderProfile(){
 
   document.getElementById('profileTotalQ').textContent=totalQ;
   document.getElementById('profileAttempts').textContent=totalAttempts;
+  // Total waktu belajar
+  const {data:durData}=await sb.from('attempts')
+    .select('duration_seconds')
+    .eq('user_id',currentUser.id);
+  const totalSec=(durData||[]).reduce((s,r)=>s+(r.duration_seconds||0),0);
+  const h=Math.floor(totalSec/3600),m=Math.floor((totalSec%3600)/60);
+  const durTxt=h>0?`${h} jam ${m} menit`:`${m} menit`;
+  document.getElementById('profileDuration').textContent=durTxt;
   document.getElementById('profileAccuracy').textContent=totalQ>0?accuracy+'%':'-';
 
   // Per-world accuracy
@@ -682,7 +692,7 @@ function getLevelConfig(level){if(level.order_num===5)return{maxQ:15,passing:12}
 async function startLevel(level){
   if(getLives()<=0){alert('Hati utama habis!');return;}
   currentLevel=level;currentQ=0;levelHearts=3;xp=0;correct=0;
-  sessionAnswers=[];currentAttemptId=null;
+  sessionAnswers=[];currentAttemptId=null;levelStartedAt=Date.now();
   const cfg=getLevelConfig(level);
   const {data}=await sb.from('questions').select('*').eq('level_id',level.id);
   if(!data||data.length===0){alert('Soal belum tersedia.');return;}
@@ -700,7 +710,7 @@ function renderHearts(){document.getElementById('hearts').innerHTML=Array.from({
 
 function renderQuestion(){
   const q=shuffledQuestions[currentQ];
-  answered=false;
+  answered=false;questionStartedAt=Date.now();
   document.getElementById('questionNum').textContent=`Soal ${currentQ+1} dari ${shuffledQuestions.length}`;
   document.getElementById('questionText').textContent=q.question;
   document.getElementById('progressFill').style.width=`${(currentQ/shuffledQuestions.length)*100}%`;
@@ -734,7 +744,7 @@ function timeUp(){
   if(answered)return;
   answered=true;levelHearts--;renderHearts();
   const q=shuffledQuestions[currentQ];
-  sessionAnswers.push({question_id:q.orig_id,selected_index:-1,is_correct:false});
+  sessionAnswers.push({question_id:q.orig_id,selected_index:-1,is_correct:false,response_time_seconds:15});
   showFeedback(false,null,true);disableOptions();
   if(levelHearts<=0){setTimeout(()=>showGameOver(),1300);return;}
   setTimeout(nextQuestion,1600);
@@ -744,8 +754,8 @@ function selectAnswer(idx){
   answered=true;clearInterval(timerInterval);
   const q=shuffledQuestions[currentQ];
   const isCorrect=idx===q.correct_index;
-  sessionAnswers.push({question_id:q.orig_id,selected_index:idx,is_correct:isCorrect});
-  const btns=document.querySelectorAll('.option-btn');
+  const rt=Math.round((Date.now()-questionStartedAt)/1000);
+  sessionAnswers.push({question_id:q.orig_id,selected_index:idx,is_correct:isCorrect,response_time_seconds:rt});  const btns=document.querySelectorAll('.option-btn');
   btns[idx].classList.add(isCorrect?'correct':'wrong');
   if(!isCorrect)btns[q.correct_index].classList.add('correct');
   disableOptions();
@@ -766,14 +776,17 @@ function nextQuestion(){currentQ++;if(currentQ>=shuffledQuestions.length){showRe
 
 async function saveAttempt(score,heartsLeft){
   const cfg=getLevelConfig(currentLevel);
-  const {data}=await sb.from('attempts').insert({
-    user_id:currentUser.id,
-    level_id:currentLevel.id,
-    score,
-    max_score:cfg.maxQ,
-    hearts_left:heartsLeft,
-    played_at:new Date().toISOString()
-  }).select('id').single();
+  const duration=levelStartedAt?Math.round((Date.now()-levelStartedAt)/1000):null;
+    const {data}=await sb.from('attempts').insert({
+      user_id:currentUser.id,
+      level_id:currentLevel.id,
+      score,
+      max_score:cfg.maxQ,
+      hearts_left:heartsLeft,
+      started_at:levelStartedAt?new Date(levelStartedAt).toISOString():null,
+      duration_seconds:duration,
+      played_at:new Date().toISOString()
+    }).select('id').single();
   if(data)currentAttemptId=data.id;
   // Save answers
   if(currentAttemptId&&sessionAnswers.length>0){
@@ -783,6 +796,7 @@ async function saveAttempt(score,heartsLeft){
       question_id:a.question_id,
       selected_index:a.selected_index,
       is_correct:a.is_correct,
+      response_time_seconds:a.response_time_seconds??null,
       answered_at:new Date().toISOString()
     }));
     await sb.from('user_answers').insert(rows);
