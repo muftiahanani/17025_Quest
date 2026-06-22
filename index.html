@@ -140,6 +140,25 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
 .clause-bar-fill{height:100%;border-radius:4px;transition:width .5s}
 .best-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:#EAF3DE;color:#27500A;font-weight:600;margin-left:6px}
 .weak-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:#FCEBEB;color:#501313;font-weight:600;margin-left:6px}
+.session-card{background:#F5F3FF;border-radius:12px;padding:.75rem 1rem;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.session-left{font-size:13px;color:#2C2C2A;font-weight:600}
+.session-sub{font-size:11px;color:#888;margin-top:2px}
+.session-right{text-align:right}
+.session-score{font-size:15px;font-weight:700;color:#534AB7}
+.session-dur{font-size:11px;color:#888;margin-top:2px}
+.analysis-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem}
+.analysis-card{border-radius:12px;padding:1rem;text-align:center}
+.analysis-card.best{background:#EAF3DE}
+.analysis-card.weak{background:#FCEBEB}
+.analysis-card-label{font-size:11px;font-weight:700;margin-bottom:6px}
+.analysis-card.best .analysis-card-label{color:#27500A}
+.analysis-card.weak .analysis-card-label{color:#501313}
+.analysis-card-val{font-size:14px;font-weight:700;color:#2C2C2A}
+.analysis-card-pct{font-size:20px;font-weight:700;margin-top:4px}
+.analysis-card.best .analysis-card-pct{color:#639922}
+.analysis-card.weak .analysis-card-pct{color:#A32D2D}
+.insight-box{background:#EEEDFE;border-radius:12px;padding:1rem;margin-bottom:1rem;font-size:13px;color:#3C3489;line-height:1.6}
+.insight-box strong{font-weight:700}
 /* EDIT */
 .edit-section{background:#F5F3FF;border-radius:14px;padding:1.25rem;margin-bottom:1rem}
 .edit-title{font-size:14px;font-weight:700;color:#2C2C2A;margin-bottom:1rem}
@@ -200,40 +219,63 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
   </div>
 
   <div id="profile" class="screen">
-    <button class="back-btn" onclick="showScreen('home')">← Kembali</button>
-    <div class="profile-wrap">
-      <div class="profile-avatar-wrap">
-        <div class="profile-avatar" id="profileAvatar">?</div>
-        <div class="profile-nickname" id="profileNickname"></div>
-        <div class="profile-email" id="profileEmail"></div>
-      </div>
-      <div class="profile-stats">
-        <div class="stat-card"><div class="stat-val" id="profileXP">0</div><div class="stat-label">Total XP</div></div>
-        <div class="stat-card"><div class="stat-val" id="profileLevels">0</div><div class="stat-label">Level Selesai</div></div>
-        <div class="stat-card"><div class="stat-val" id="profileAccuracy">-</div><div class="stat-label">Akurasi</div></div>
-      </div>
-      <div class="profile-stats" style="grid-template-columns:1fr 1fr;margin-top:0">
-        <div class="stat-card"><div class="stat-val" id="profileTotalQ">0</div><div class="stat-label">Total Soal Dijawab</div></div>
-        <div class="stat-card"><div class="stat-val" id="profileAttempts">0</div><div class="stat-label">Total Sesi Main</div></div>
-        <div class="stat-card"><div class="stat-val" id="profileDuration" style="font-size:14px">-</div><div class="stat-label">Total Waktu Belajar</div></div>
-      </div>
-      <div class="profile-lives" style="margin-top:1rem">
-        <div class="profile-lives-val" id="profileLivesVal">❤️❤️❤️❤️❤️</div>
-        <div class="profile-lives-label">Hati Utama</div>
-      </div>
-      <div class="stat-section" id="clauseStats" style="display:none">
-        <div class="stat-section-title">📊 Akurasi per Dunia</div>
-        <div id="clauseBarList"></div>
-      </div>
-      <div class="edit-section">
-        <div class="edit-title">✏️ Edit Profil</div>
-        <div class="field"><label>Nama Lengkap</label><input type="text" id="editName" placeholder="Nama lengkap"></div>
-        <div class="field"><label>Nickname (tampil di ranking)</label><input type="text" id="editNickname" placeholder="Nickname" maxlength="20"></div>
-        <div class="field"><label>Email</label><input type="email" id="editEmail" disabled></div>
-        <button class="btn-primary" onclick="saveProfile()">Simpan</button>
-        <div class="save-msg" id="saveMsg"></div>
-      </div>
+  <button class="back-btn" onclick="showScreen('home')">← Kembali</button>
+
+  <!-- Avatar ringkas selalu tampil -->
+  <div style="text-align:center;padding:.75rem 0 1rem">
+    <div class="profile-avatar" id="profileAvatar">?</div>
+    <div class="profile-nickname" id="profileNickname"></div>
+    <div class="profile-email" id="profileEmail"></div>
+  </div>
+
+  <!-- Tab navigasi -->
+  <div class="tab-row" style="margin-bottom:1.25rem">
+    <button class="tab-btn active" onclick="switchProfileTab('info')">👤 Profil</button>
+    <button class="tab-btn" onclick="switchProfileTab('stats')">📊 Statistik</button>
+    <button class="tab-btn" onclick="switchProfileTab('analysis')">🧠 Analisis</button>
+  </div>
+
+  <!-- Tab 1: Profil -->
+  <div id="ptab-info">
+    <div class="profile-lives" style="margin-bottom:1rem">
+      <div class="profile-lives-val" id="profileLivesVal">❤️❤️❤️❤️❤️</div>
+      <div class="profile-lives-label">Hati Utama</div>
     </div>
+    <div class="edit-section">
+      <div class="edit-title">✏️ Edit Profil</div>
+      <div class="field"><label>Nama Lengkap</label><input type="text" id="editName" placeholder="Nama lengkap"></div>
+      <div class="field"><label>Nickname (tampil di ranking)</label><input type="text" id="editNickname" placeholder="Nickname" maxlength="20"></div>
+      <div class="field"><label>Email</label><input type="email" id="editEmail" disabled></div>
+      <button class="btn-primary" onclick="saveProfile()">Simpan</button>
+      <div class="save-msg" id="saveMsg"></div>
+    </div>
+  </div>
+
+  <!-- Tab 2: Statistik -->
+  <div id="ptab-stats" style="display:none">
+    <div class="profile-stats">
+      <div class="stat-card"><div class="stat-val" id="profileXP">0</div><div class="stat-label">Total XP</div></div>
+      <div class="stat-card"><div class="stat-val" id="profileLevels">0</div><div class="stat-label">Level Selesai</div></div>
+      <div class="stat-card"><div class="stat-val" id="profileAccuracy">-</div><div class="stat-label">Akurasi</div></div>
+    </div>
+    <div class="profile-stats" style="grid-template-columns:1fr 1fr 1fr;margin-top:0">
+      <div class="stat-card"><div class="stat-val" id="profileTotalQ">0</div><div class="stat-label">Total Soal Dijawab</div></div>
+      <div class="stat-card"><div class="stat-val" id="profileAttempts">0</div><div class="stat-label">Total Sesi Main</div></div>
+      <div class="stat-card"><div class="stat-val" id="profileDuration" style="font-size:14px">-</div><div class="stat-label">Total Waktu Belajar</div></div>
+    </div>
+
+    <!-- Riwayat sesi terbaru -->
+    <div class="stat-section" style="margin-top:1rem">
+      <div class="stat-section-title">🕓 Riwayat Sesi Terbaru</div>
+      <div id="recentSessions"><div class="loading">Memuat...</div></div>
+    </div>
+  </div>
+
+  <!-- Tab 3: Analisis Kompetensi -->
+  <div id="ptab-analysis" style="display:none">
+    <div id="analysisContent"><div class="loading">Memuat...</div></div>
+  </div>
+</div>
   </div>
 
   <div id="levelSelect" class="screen">
@@ -581,21 +623,152 @@ async function renderProfile(){
   }
 }
 
-async function saveProfile(){
-  const name=document.getElementById('editName').value.trim();
-  const nick=document.getElementById('editNickname').value.trim();
-  if(!name||!nick){document.getElementById('saveMsg').textContent='Nama dan nickname wajib diisi.';document.getElementById('saveMsg').className='save-msg error';return;}
-  if(nick.length<3){document.getElementById('saveMsg').textContent='Nickname minimal 3 karakter.';document.getElementById('saveMsg').className='save-msg error';return;}
-  const {error}=await sb.from('profiles').update({full_name:name,nickname:nick}).eq('id',currentUser.id);
-  if(error){document.getElementById('saveMsg').textContent='Gagal menyimpan.';document.getElementById('saveMsg').className='save-msg error';return;}
-  userProfile.full_name=name;userProfile.nickname=nick;
-  document.getElementById('userName').textContent='👋 '+name;
-  document.getElementById('profileNickname').textContent=nick;
-  document.getElementById('profileAvatar').textContent=nick.slice(0,2).toUpperCase();
-  document.getElementById('saveMsg').textContent='✅ Profil berhasil disimpan!';
-  document.getElementById('saveMsg').className='save-msg success';
+let profileTabLoaded={stats:false,analysis:false};
+
+function switchProfileTab(tab){
+  ['info','stats','analysis'].forEach(t=>{
+    document.getElementById('ptab-'+t).style.display=t===tab?'block':'none';
+  });
+  document.querySelectorAll('#profile .tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['info','stats','analysis'][i]===tab);
+  });
+  if(tab==='stats'&&!profileTabLoaded.stats){loadProfileStats();profileTabLoaded.stats=true;}
+  if(tab==='analysis'&&!profileTabLoaded.analysis){loadProfileAnalysis();profileTabLoaded.analysis=true;}
 }
 
+async function renderProfile(){
+  // Reset tab ke info setiap buka profil
+  profileTabLoaded={stats:false,analysis:false};
+  switchProfileTab('info');
+
+  const name=userProfile?.full_name||currentUser.user_metadata?.full_name||'';
+  const nick=userProfile?.nickname||(name.slice(0,3)+'***');
+  const lives=getLives();
+
+  document.getElementById('profileAvatar').textContent=nick.slice(0,2).toUpperCase();
+  document.getElementById('profileNickname').textContent=nick;
+  document.getElementById('profileEmail').textContent=currentUser.email;
+  document.getElementById('profileLivesVal').textContent=Array.from({length:MAX_LIVES},(_,i)=>i<lives?'❤️':'🤍').join('');
+  document.getElementById('editName').value=name;
+  document.getElementById('editNickname').value=nick;
+  document.getElementById('editEmail').value=currentUser.email;
+  document.getElementById('saveMsg').textContent='';
+
+  // XP & level (tidak perlu query, sudah ada di memori)
+  document.getElementById('profileXP').textContent=getTotalXP();
+  document.getElementById('profileLevels').textContent=getLevelsCompleted();
+}
+
+async function loadProfileStats(){
+  const [attAns, attCount, durData] = await Promise.all([
+    sb.from('user_answers').select('is_correct,question_id').eq('user_id',currentUser.id),
+    sb.from('attempts').select('id',{count:'exact'}).eq('user_id',currentUser.id),
+    sb.from('attempts').select('duration_seconds').eq('user_id',currentUser.id)
+  ]);
+
+  const attData=attAns.data||[];
+  const totalQ=attData.length;
+  const totalCorrect=attData.filter(a=>a.is_correct).length;
+  const accuracy=totalQ>0?Math.round(totalCorrect/totalQ*100):0;
+  const totalAttempts=attCount.data?.length||0;
+  const totalSec=(durData.data||[]).reduce((s,r)=>s+(r.duration_seconds||0),0);
+
+  document.getElementById('profileTotalQ').textContent=totalQ;
+  document.getElementById('profileAttempts').textContent=totalAttempts;
+  document.getElementById('profileAccuracy').textContent=totalQ>0?accuracy+'%':'-';
+  document.getElementById('profileDuration').textContent=formatDuration(totalSec);
+
+  // Riwayat sesi terbaru
+  const {data:sessions}=await sb.from('attempts')
+    .select('score,max_score,duration_seconds,played_at,level_id')
+    .eq('user_id',currentUser.id)
+    .order('played_at',{ascending:false})
+    .limit(5);
+
+  const sessEl=document.getElementById('recentSessions');
+  if(!sessions||sessions.length===0){sessEl.innerHTML='<div style="font-size:13px;color:#888;text-align:center;padding:1rem">Belum ada sesi.</div>';return;}
+  sessEl.innerHTML=sessions.map(s=>{
+    const lv=allLevels.find(l=>l.id===s.level_id);
+    const w=lv?worlds.find(w=>w.id===lv.world_id):null;
+    const label=lv?`${w?.icon||'📚'} ${lv.name}`:'Level tidak diketahui';
+    const date=new Date(s.played_at).toLocaleDateString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const dur=s.duration_seconds?`⏱️ ${formatDuration(s.duration_seconds)}`:'';
+    const pct=s.max_score>0?Math.round(s.score/s.max_score*100):0;
+    const scoreColor=pct>=80?'#27500A':pct>=60?'#534AB7':'#A32D2D';
+    return `<div class="session-card">
+      <div class="session-left">${label}<div class="session-sub">${date}</div></div>
+      <div class="session-right"><div class="session-score" style="color:${scoreColor}">${s.score}/${s.max_score}</div><div class="session-dur">${dur}</div></div>
+    </div>`;
+  }).join('');
+}
+
+async function loadProfileAnalysis(){
+  const el=document.getElementById('analysisContent');
+  const {data:attData}=await sb.from('user_answers')
+    .select('is_correct,question_id').eq('user_id',currentUser.id);
+
+  if(!attData||attData.length===0){
+    el.innerHTML='<div style="font-size:13px;color:#888;text-align:center;padding:2rem">Belum ada data. Mainkan beberapa level dulu!</div>';
+    return;
+  }
+
+  const qIds=[...new Set(attData.map(a=>a.question_id))];
+  const {data:qData}=await sb.from('questions').select('id,level_id').in('id',qIds);
+  const qMap={};(qData||[]).forEach(q=>{qMap[q.id]=q.level_id;});
+  const lvMap={};allLevels.forEach(l=>{lvMap[l.id]=l.world_id;});
+
+  const worldStats={};
+  attData.forEach(a=>{
+    const wId=lvMap[qMap[a.question_id]];
+    if(!wId)return;
+    if(!worldStats[wId]){worldStats[wId]={correct:0,total:0};}
+    worldStats[wId].total++;
+    if(a.is_correct)worldStats[wId].correct++;
+  });
+
+  const entries=worlds.map((w,wi)=>({w,wi,
+    pct:worldStats[w.id]?Math.round(worldStats[w.id].correct/worldStats[w.id].total*100):null
+  })).filter(e=>e.pct!==null);
+
+  if(entries.length===0){el.innerHTML='<div style="font-size:13px;color:#888;text-align:center;padding:2rem">Belum cukup data.</div>';return;}
+
+  const best=entries.reduce((a,b)=>a.pct>=b.pct?a:b);
+  const weak=entries.length>1?entries.reduce((a,b)=>a.pct<=b.pct?a:b):null;
+
+  // Insight otomatis
+  let insight='';
+  if(best.pct>=90)insight+=`Kamu sangat menguasai <strong>${best.w.name}</strong> dengan akurasi ${best.pct}%. `;
+  else if(best.pct>=70)insight+=`Kamu cukup baik di <strong>${best.w.name}</strong> (${best.pct}%). `;
+  if(weak&&weak.pct<60)insight+=`Fokuskan latihan di <strong>${weak.w.name}</strong> — akurasi ${weak.pct}% masih perlu ditingkatkan.`;
+  else if(weak)insight+=`Semua klausul sudah cukup baik. Terus pertahankan!`;
+
+  el.innerHTML=`
+    ${entries.length>=2?`<div class="analysis-summary">
+      <div class="analysis-card best">
+        <div class="analysis-card-label">🏆 Terbaik</div>
+        <div class="analysis-card-val">${best.w.icon||''} ${best.w.name}</div>
+        <div class="analysis-card-pct">${best.pct}%</div>
+      </div>
+      ${weak?`<div class="analysis-card weak">
+        <div class="analysis-card-label">💪 Perlu Latihan</div>
+        <div class="analysis-card-val">${weak.w.icon||''} ${weak.w.name}</div>
+        <div class="analysis-card-pct">${weak.pct}%</div>
+      </div>`:''}
+    </div>`:''}
+    ${insight?`<div class="insight-box">${insight}</div>`:''}
+    <div class="stat-section-title" style="margin-bottom:10px">📊 Akurasi per Dunia</div>
+    ${entries.map(({w,wi,pct})=>{
+      const color=WORLD_COLORS[wi]||'#534AB7';
+      return`<div class="clause-bar-wrap">
+        <div class="clause-bar-header">
+          <span class="clause-bar-name">${w.icon||''} ${w.name}</span>
+          <span class="clause-bar-pct" style="color:${color}">${pct}%</span>
+        </div>
+        <div class="clause-bar-bg"><div class="clause-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      </div>`;
+    }).join('')}
+  `;
+}
 // ── RANKING ──────────────────────────────────────
 async function loadRanking(){
   const list=document.getElementById('rankList');
