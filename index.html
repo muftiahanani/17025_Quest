@@ -283,6 +283,7 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
       <div id="resultBadge"></div>
       <div class="xp-earned" id="resultXP"></div>
       <div class="result-sub" id="resultSub"></div>
+      <div class="result-sub" id="resultDuration" style="margin-top:4px;font-size:13px;color:#888"></div>
       <button class="btn-primary" id="nextLevelBtn" onclick="goNextLevel()" style="display:none">Level Berikutnya →</button>
       <button class="btn-primary" id="retryBtn" onclick="retryLevel()">Main Lagi</button>
       <button class="btn-secondary" onclick="showScreen('levelSelect')">Pilih Level Lain</button>
@@ -404,6 +405,14 @@ function msUntilNextLife(){
   const elapsed=Date.now()-lastLost;
   return LIFE_REGEN_MS-(elapsed%LIFE_REGEN_MS);
 }
+function formatDuration(sec){
+  if(!sec||sec<0)return'0:00';
+  const h=Math.floor(sec/3600);
+  const m=Math.floor((sec%3600)/60);
+  const s=sec%60;
+  if(h>0)return`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return`${m}:${String(s).padStart(2,'0')}`;
+}
 function formatCountdown(ms){
   const total=Math.ceil(ms/1000);
   const m=Math.floor(total/60),s=total%60;
@@ -515,8 +524,7 @@ async function renderProfile(){
     .eq('user_id',currentUser.id);
   const totalSec=(durData||[]).reduce((s,r)=>s+(r.duration_seconds||0),0);
   const h=Math.floor(totalSec/3600),m=Math.floor((totalSec%3600)/60);
-  const durTxt=h>0?`${h} jam ${m} menit`:`${m} menit`;
-  document.getElementById('profileDuration').textContent=durTxt;
+  document.getElementById('profileDuration').textContent=formatDuration(totalSec);
   document.getElementById('profileAccuracy').textContent=totalQ>0?accuracy+'%':'-';
 
   // Per-world accuracy
@@ -825,6 +833,8 @@ async function showResult(){
   document.getElementById('resultStars').textContent=stars;
   document.getElementById('resultXP').textContent=`+${xp} XP diperoleh`;
   document.getElementById('resultSub').textContent=currentLevel.name;
+  const dur=levelStartedAt?Math.round((Date.now()-levelStartedAt)/1000):null;
+  document.getElementById('resultDuration').textContent=dur?`⏱️ Waktu: ${formatDuration(dur)}`:'';
   document.getElementById('resultBadge').innerHTML=passed
     ?`<div class="pass-badge">✅ Level selesai! Level berikutnya terbuka</div>`
     :`<div class="fail-badge">Butuh ${passing}/${maxQ} untuk lanjut. Semangat!</div>`;
