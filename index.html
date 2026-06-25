@@ -235,7 +235,7 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
         <div class="campaign-sub">Klausul 4–8</div>
       </button>
       <button class="campaign-btn" id="btnCampB" onclick="switchCampaign('quality')">
-        <div class="campaign-icon">🔬</div>
+        <div class="campaign-icon">📊</div>
         <div class="campaign-label">Quality Control Path</div>
         <div class="campaign-sub">Pemastian Hasil</div>
       </button>
@@ -582,7 +582,7 @@ function switchCampaign(campaign){
   const campAXP=getCampaignXP('management');
   const campBXP=getCampaignXP('quality');
   document.getElementById('btnCampA').querySelector('.campaign-icon').textContent='🏛️';
-  document.getElementById('btnCampB').querySelector('.campaign-icon').textContent='🔬';
+  document.getElementById('btnCampB').querySelector('.campaign-icon').textContent='📊';
   // Re-render world list dengan filter campaign
   renderHome();
 }
