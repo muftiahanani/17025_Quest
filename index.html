@@ -266,7 +266,7 @@ h1{font-size:2rem;font-weight:700;color:#534AB7}h1 span{color:#D4537E}
   <div id="tabRanking" style="display:none">
     <div class="rank-header">
       <div class="rank-title">🏆 Papan Peringkat</div>
-      <div class="rank-sub">Urutan: level selesai → XP</div>
+      <div class="rank-sub">Urutan: level selesai → akurasi → XP</div>
     </div>
     <div class="rank-list" id="rankList"><div class="loading">Memuat...</div></div>
   </div>
@@ -411,6 +411,7 @@ let timerVal=15, timerInterval=null, answered=false, livesTimerInterval=null;
 let sessionAnswers=[], currentAttemptId=null;
 let levelStartedAt=null, questionStartedAt=null;
 let currentCampaign='management';
+let allAttempts=[];
 let profileTabLoaded={stats:false,analysis:false};
 
 // ── SCREEN ────────────────────────────────────────
@@ -481,13 +482,14 @@ async function afterLogin(){await loadData();showScreen('home');}
 
 // ── DATA ──────────────────────────────────────────
 async function loadData(){
-  const [w,l,p,prof]=await Promise.all([
+  const [w,l,p,prof,att]=await Promise.all([
     sb.from('worlds').select('*').order('order_num'),
     sb.from('levels').select('*').order('order_num'),
     sb.from('user_progress').select('*').eq('user_id',currentUser.id),
-    sb.from('profiles').select('*').eq('id',currentUser.id).single()
+    sb.from('profiles').select('*').eq('id',currentUser.id).single(),
+    sb.from('attempts').select('score,level_id').eq('user_id',currentUser.id)
   ]);
-  worlds=w.data||[];allLevels=l.data||[];allProgress=p.data||[];
+  worlds=w.data||[];allLevels=l.data||[];allProgress=p.data||[];allAttempts=att.data||[];
   userProfile=prof.data||{lives:MAX_LIVES,last_life_lost:null,full_name:'',nickname:''};
   if(!prof.data){
     const name=currentUser.user_metadata?.full_name||'';
@@ -566,12 +568,12 @@ async function loseMainLife(){
 }
 
 // ── XP & STATS ────────────────────────────────────
-function getTotalXP(){return allProgress.reduce((sum,p)=>sum+(p.best_score*10),0);}
+function getTotalXP(){return allAttempts.reduce((sum,a)=>sum+(a.score*10),0);}
 function getLevelsCompleted(){return allProgress.filter(p=>p.best_score>=8).length;}
 function getCampaignXP(campaign){
   const campWorldIds=worlds.filter(w=>(w.campaign||'management')===campaign).map(w=>w.id);
   const campLevelIds=allLevels.filter(l=>campWorldIds.includes(l.world_id)).map(l=>l.id);
-  return allProgress.filter(p=>campLevelIds.includes(p.level_id)).reduce((sum,p)=>sum+(p.best_score*10),0);
+  return allAttempts.filter(a=>campLevelIds.includes(a.level_id)).reduce((sum,a)=>sum+(a.score*10),0);
 }
 
 // ── UTIL ──────────────────────────────────────────
@@ -1112,22 +1114,41 @@ async function saveProfile(){
 async function loadRanking(){
   const list=document.getElementById('rankList');
   list.innerHTML='<div class="loading">Memuat ranking...</div>';
-  const [{data:allProg},{data:profilesData}]=await Promise.all([
-    sb.from('user_progress').select('user_id,best_score'),
-    sb.from('profiles').select('id,nickname,full_name')
+  const [{data:allProg},{data:profilesData},{data:allAtt},{data:allAnswers}]=await Promise.all([
+    sb.from('user_progress').select('user_id,best_score,level_id'),
+    sb.from('profiles').select('id,nickname,full_name'),
+    sb.from('attempts').select('user_id,score'),
+    sb.from('user_answers').select('user_id,is_correct')
   ]);
   if(!allProg||allProg.length===0){list.innerHTML='<div class="loading">Belum ada data ranking.</div>';return;}
   const profileMap={};
   (profilesData||[]).forEach(p=>{profileMap[p.id]=p.nickname||(p.full_name||'').slice(0,3)+'***';});
-  const userXP={},userLevels={};
-  allProg.forEach(p=>{
-    userXP[p.user_id]=(userXP[p.user_id]||0)+(p.best_score*10);
-    if(p.best_score>=8)userLevels[p.user_id]=(userLevels[p.user_id]||0)+1;
+  const userXP={};
+  (allAtt||[]).forEach(a=>{userXP[a.user_id]=(userXP[a.user_id]||0)+(a.score*10);});
+  const userLevels={};
+  (allProg||[]).forEach(p=>{
+    const lv=allLevels.find(l=>l.id===p.level_id);
+    const passing=lv?passingScore(lv):8;
+    if(p.best_score>=passing)userLevels[p.user_id]=(userLevels[p.user_id]||0)+1;
   });
-  const sorted=Object.keys(userXP).map(uid=>({uid,xp:userXP[uid],lv:userLevels[uid]||0}))
-    .sort((a,b)=>b.lv-a.lv||b.xp-a.xp).slice(0,20);
+  const userAcc={};
+  (allAnswers||[]).forEach(a=>{
+    if(!userAcc[a.user_id])userAcc[a.user_id]={correct:0,total:0};
+    userAcc[a.user_id].total++;
+    if(a.is_correct)userAcc[a.user_id].correct++;
+  });
+  const allUids=[...new Set([...Object.keys(userXP),...Object.keys(userLevels)])];
+  const sorted=allUids.map(uid=>({
+    uid,
+    xp:userXP[uid]||0,
+    lv:userLevels[uid]||0,
+    accuracy:userAcc[uid]?Math.round(userAcc[uid].correct/userAcc[uid].total*100):0
+  }))
+  .filter(u=>u.lv>0||u.xp>0)
+  .sort((a,b)=>b.lv-a.lv||b.accuracy-a.accuracy||b.xp-a.xp)
+  .slice(0,20);
   list.innerHTML='';
-  sorted.forEach(({uid,xp:totalXp,lv:levDone},i)=>{
+  sorted.forEach(({uid,xp:totalXp,lv:levDone,accuracy},i)=>{
     const isMe=uid===currentUser.id;
     const name=profileMap[uid]||'Anonim';
     const pos=i+1;
@@ -1138,7 +1159,7 @@ async function loadRanking(){
     card.innerHTML=`<div class="rank-pos ${posClass}">${medal||pos}</div>
       <div class="rank-avatar">${name.slice(0,2).toUpperCase()}</div>
       <div class="rank-info"><div class="rank-name">${name}${isMe?' (Kamu)':''}</div>
-      <div class="rank-detail">${levDone} level selesai</div></div>
+      <div class="rank-detail">${levDone} level selesai · ${accuracy}% akurasi</div></div>
       <div class="rank-xp"><div class="rank-xp-val">${totalXp} XP</div>
       <div class="rank-xp-lv">Lv ${levDone}</div></div>`;
     list.appendChild(card);
